@@ -271,7 +271,11 @@ Main = Backbone.View.extend({
     this.model.set("timestamp", Date.now());
     config = JSON.stringify(this.model.toJSON());
     _ref1 = this.getValues(), script = _ref1.script, markup = _ref1.markup, style = _ref1.style;
+<<<<<<< HEAD
     url = "https://altjsdoit.github.io/#zip=" + encodeURIComponent(zipDataURI({
+=======
+    url = makeURL(location) + "#zip/" + encodeURIComponent(zipDataURI({
+>>>>>>> 5edd435d4a6b3932ccfccc42b5c0107308fddc1e
       config: config,
       script: script,
       markup: markup,
@@ -292,7 +296,11 @@ Main = Backbone.View.extend({
       success: (function(_this) {
         return function(res) {
           $("#setting-project-url").val(res.id);
+<<<<<<< HEAD
           $("#setting-project-twitter").html($("<a href=\"https://twitter.com/share\" class=\"twitter-share-button\" data-size=\"large\" data-text=\"'" + (_this.model.get('title')) + "'\" data-url=\"" + res.id + "\" data-hashtags=\"altjsdoit\" data-count=\"none\" data-lang=\"en\">Tweet</a>"));
+=======
+          $("#setting-project-twitter").html($("<a href=\"https://twitter.com/share\" class=\"twitter-share-button\" data-size=\"large\" data-text=\"'" + (_this.model.get('title')) + "'\" data-url=\"" + res.id + "\" data-hashtags=\"altjsdoit\" data-count=\"count\" data-lang=\"en\">Tweet</a>"));
+>>>>>>> 5edd435d4a6b3932ccfccc42b5c0107308fddc1e
           return twttr.widgets.load();
         };
       })(this)
@@ -300,7 +308,11 @@ Main = Backbone.View.extend({
   },
   loadURI: function() {
     var config, markup, script, style, _ref1;
+<<<<<<< HEAD
     if (location.hash.slice(0, 5) === "#zip=") {
+=======
+    if (location.hash.slice(0, 5) === "#zip/") {
+>>>>>>> 5edd435d4a6b3932ccfccc42b5c0107308fddc1e
       _ref1 = unzipDataURI(decodeURIComponent(location.hash.slice(5))), config = _ref1.config, script = _ref1.script, markup = _ref1.markup, style = _ref1.style;
       config = JSON.parse(config || "{}");
       this.model.set(config);
