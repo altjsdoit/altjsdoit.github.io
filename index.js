@@ -1,4 +1,3 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Config, Editor, Main, Menu, Setting;
 
 $(function() {
@@ -61,7 +60,7 @@ Main = Backbone.View.extend({
   },
   loadURI: function() {
     var config, markup, script, style, zip, _ref;
-    zip = decodeURIQuery(location.hash).zip;
+    zip = decodeURIQuery(location.hash.slice(1)).zip;
     if (zip != null) {
       _ref = unzipDataURI(decodeURIComponent(location.hash.slice(5))), config = _ref.config, script = _ref.script, markup = _ref.markup, style = _ref.style;
       config = JSON.parse(config || "{}");
@@ -323,6 +322,3 @@ Editor = Backbone.View.extend({
     }
   }
 });
-
-
-},{}]},{},[1])
