@@ -1,22 +1,9 @@
-var URLToArrayBuffer, URLToText, build, compile, createBlobURL, decodeURIQuery, encodeURIQuery, expandURL, getCompilerSetting, getElmVal, makeURL, shortenURL, unzipDataURI, zipDataURI;
+var URLToArrayBuffer, URLToText, build, compileAll, createBlobURL, decodeDataURI, decodeURIQuery, encodeDataURI, encodeURIQuery, expandURL, getCompilerSetting, getElmVal, makeURL, shortenURL, unzipDataURI, zipDataURI;
 
 createBlobURL = function(data, mimetype) {
   return URL.createObjectURL(new Blob([data], {
     type: mimetype
   }));
-};
-
-URLToArrayBuffer = function(url, callback) {
-  var xhr;
-  xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.responseType = 'arraybuffer';
-  xhr.onload = function() {
-    if (this.status === 200 && this.readyState === 4) {
-      return callback(this.response);
-    }
-  };
-  return xhr.send();
 };
 
 URLToText = function(url, callback) {
@@ -35,30 +22,53 @@ URLToText = function(url, callback) {
   });
 };
 
-zipDataURI = function(dic) {
-  var key, val, zip;
-  zip = new JSZip();
-  for (key in dic) {
-    val = dic[key];
-    zip.file(key, val);
-  }
-  return zip.generate({
-    compression: "DEFLATE"
-  });
+URLToArrayBuffer = function(url, callback) {
+  var xhr;
+  xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'arraybuffer';
+  xhr.onerror = function(err) {
+    throw new Error(err);
+  };
+  xhr.onload = function() {
+    if (this.status === 200 || this.status === 0 && this.readyState === 4) {
+      return callback(this.response);
+    }
+  };
+  return xhr.send();
 };
 
-unzipDataURI = function(base64) {
-  var files, hash, key, val, zip;
-  zip = new JSZip();
-  files = zip.load(base64, {
-    base64: true
-  }).files;
-  hash = {};
-  for (key in files) {
-    val = files[key];
-    hash[key] = zip.file(key).asText();
+encodeDataURI = function(data, mimetype, callback) {
+  var reader;
+  reader = new FileReader();
+  reader.readAsDataURL(new Blob([data], {
+    type: mimetype
+  }));
+  reader.onloadend = function() {
+    return callback(reader.result.replace(";base64,", ";charset=utf-8;base64,"));
+  };
+  return reader.onerror = function(err) {
+    throw new Error(err);
+  };
+};
+
+decodeDataURI = function(dataURI, callback) {
+  var ab, byteString, i, ia, mimeString, reader, tmp, _i, _ref;
+  tmp = dataURI.split(',');
+  mimeString = tmp[0].split(':')[1].split(';')[0];
+  byteString = atob(tmp[1]);
+  ab = new ArrayBuffer(byteString.length);
+  ia = new Uint8Array(ab);
+  for (i = _i = 0, _ref = byteString.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+    ia[i] = byteString.charCodeAt(i);
   }
-  return hash;
+  reader = new FileReader();
+  reader.readAsText(new Blob([ab], {
+    type: mimeString
+  }));
+  return reader.onloadend = function() {
+    return callback(reader.result);
+  };
 };
 
 makeURL = function(location) {
@@ -121,6 +131,40 @@ expandURL = function(url, callback) {
   });
 };
 
+zipDataURI = function(dic) {
+  var key, val, zip;
+  zip = new JSZip();
+  for (key in dic) {
+    val = dic[key];
+    zip.file(key, val);
+  }
+  return zip.generate({
+    compression: "DEFLATE"
+  });
+};
+
+unzipDataURI = function(base64) {
+  var files, hash, key, val, zip;
+  zip = new JSZip();
+  files = zip.load(base64, {
+    base64: true
+  }).files;
+  hash = {};
+  for (key in files) {
+    val = files[key];
+    hash[key] = zip.file(key).asText();
+  }
+  return hash;
+};
+
+getElmVal = function(elm) {
+  if (elm instanceof HTMLInputElement && $(elm).attr("type") === "checkbox") {
+    return $(elm).is(':checked');
+  } else {
+    return $(elm).val();
+  }
+};
+
 getCompilerSetting = function(lang) {
   var f;
   f = function(a, b) {
@@ -132,13 +176,19 @@ getCompilerSetting = function(lang) {
   switch (lang) {
     case "JavaScript":
       return f("javascript", function(code, cb) {
-        return cb(null, code);
+        return setTimeout(function() {
+          return cb(null, code);
+        });
       });
     case "CoffeeScript":
       return f("coffeescript", function(code, cb) {
-        return cb(null, CoffeeScript.compile(code, {
+        var _code;
+        _code = CoffeeScript.compile(code, {
           bare: true
-        }));
+        });
+        return setTimeout(function() {
+          return cb(null, _code);
+        });
       });
     case "TypeScript":
       return f("javascript", function(code, cb) {
@@ -164,7 +214,9 @@ getCompilerSetting = function(lang) {
           }
           console.error(err);
         }
-        return cb(null, output);
+        return setTimeout(function() {
+          return cb(null, output);
+        });
       });
     case "TypedCoffeeScript":
       return f("coffeescript", function(code, cb) {
@@ -186,118 +238,141 @@ getCompilerSetting = function(lang) {
           bare: true
         }).toBasicObject();
         jsCode = escodegen.generate(jsAST);
-        return cb(null, jsCode);
+        return setTimeout(function() {
+          return cb(null, jsCode);
+        });
       });
     case "Traceur":
       return f("javascript", function(code, cb) {
-        var project, reporter;
+        var project, reporter, _code;
         reporter = new traceur.util.ErrorReporter();
         reporter.reportMessageInternal = function(location, kind, format, args) {
           throw new Error(traceur.util.ErrorReporter.format(location, format, args));
         };
         project = new traceur.semantics.symbols.Project(location.href);
         project.addFile(new traceur.syntax.SourceFile('a.js', code));
-        return cb(null, traceur.outputgeneration.ProjectWriter.write(traceur.codegeneration.Compiler.compile(reporter, project, false)));
+        _code = traceur.outputgeneration.ProjectWriter.write(traceur.codegeneration.Compiler.compile(reporter, project, false));
+        return setTimeout(function() {
+          return cb(null, _code);
+        });
       });
     case "LiveScript":
       return f("coffeescript", function(code, cb) {
-        return cb(null, LiveScript.compile(code));
+        var _code;
+        _code = LiveScript.compile(code);
+        return setTimeout(function() {
+          return cb(null, _code);
+        });
       });
     case "GorillaScript":
       return f("coffeescript", function(code, cb) {
-        return cb(null, GorillaScript.compileSync(code).code);
+        var _code;
+        _code = GorillaScript.compileSync(code).code;
+        return setTimeout(function() {
+          return cb(null, _code);
+        });
       });
     case "Wisp":
       return f("clojure", function(code, cb) {
         var result;
         result = wisp.compiler.compile(code);
-        return cb(result.error, result.code);
+        return setTimeout(function() {
+          return cb(result.error, result.code);
+        });
       });
     case "LispyScript":
       return f("scheme", function(code, cb) {
-        return cb(null, lispyscript._compile(code));
+        var _code;
+        _code = lispyscript._compile(code);
+        return setTimeout(function() {
+          return cb(null, _code);
+        });
       });
     case "HTML":
       return f("xml", function(code, cb) {
-        return cb(null, code);
+        return setTimeout(function() {
+          return cb(null, code);
+        });
       });
     case "Jade":
       return f("jade", function(code, cb) {
-        return cb(null, jade.compile(code, {
+        var _code;
+        _code = jade.compile(code, {
           pretty: true
-        })({}));
+        })({});
+        return setTimeout(function() {
+          return cb(null, _code);
+        });
       });
     case "CSS":
       return f("css", function(code, cb) {
-        return cb(null, code);
+        return setTimeout(function() {
+          return cb(null, code);
+        });
       });
     case "LESS":
       return f("css", function(code, cb) {
         return (new less.Parser({})).parse(code, function(err, tree) {
           if (err) {
-            return cb(err);
+            return setTimeout(function() {
+              return cb(err, code);
+            });
           } else {
-            return cb(err, tree.toCSS({}));
+            return setTimeout(function() {
+              return cb(err, tree.toCSS({}));
+            });
           }
         });
       });
     case "Stylus":
       return f("css", function(code, cb) {
-        return stylus.render(code, {}, cb);
+        return stylus.render(code, {}, function(err, code) {
+          return setTimeout(function() {
+            return cb(err, code);
+          });
+        });
       });
     default:
       throw new TypeError("unknown compiler");
   }
 };
 
-compile = function(altFoo, code, callback) {
-  var compilerFn;
-  compilerFn = getCompilerSetting(altFoo).compile;
-  return setTimeout(function() {
-    var err;
-    try {
-      return compilerFn(code, function(err, _code) {
-        return callback(err, _code);
-      });
-    } catch (_error) {
-      err = _error;
-      console.error(err, err.stack);
-      return callback(err, code);
+compileAll = function(dic, callback) {
+  var compile, key, promises, val;
+  compile = function(lang, code) {
+    return new Promise(function(resolve, reject) {
+      var compilerFn, err;
+      compilerFn = getCompilerSetting(lang).compile;
+      try {
+        return compilerFn(code, function(err, _code) {
+          return resolve([err, _code]);
+        });
+      } catch (_error) {
+        err = _error;
+        return resolve([err, code]);
+      }
+    });
+  };
+  promises = (function() {
+    var _results;
+    _results = [];
+    for (key in dic) {
+      val = dic[key];
+      _results.push(compile(key, val));
     }
+    return _results;
+  })();
+  return Promise.all(promises).then(function(results) {
+    return callback(results);
+  })["catch"](function(err) {
+    return console.error(err, err.stack);
   });
 };
 
-build = function(_arg, _arg1, _arg2, callback) {
-  var altcss, althtml, altjs, enableES6shim, enableFirebugLite, enableJQuery, enableMathjs, enableProcessing, enableUnderscore, markup, script, style;
-  altjs = _arg.altjs, althtml = _arg.althtml, altcss = _arg.altcss;
-  script = _arg1.script, markup = _arg1.markup, style = _arg1.style;
-  enableFirebugLite = _arg2.enableFirebugLite, enableJQuery = _arg2.enableJQuery, enableUnderscore = _arg2.enableUnderscore, enableES6shim = _arg2.enableES6shim, enableProcessing = _arg2.enableProcessing, enableMathjs = _arg2.enableMathjs;
-  return Promise.all([
-    new Promise(function(resolve) {
-      return compile(altjs, script, function(err, code) {
-        return resolve({
-          err: err,
-          code: code
-        });
-      });
-    }), new Promise(function(resolve) {
-      return compile(althtml, markup, function(err, code) {
-        return resolve({
-          err: err,
-          code: code
-        });
-      });
-    }), new Promise(function(resolve) {
-      return compile(altcss, style, function(err, code) {
-        return resolve({
-          err: err,
-          code: code
-        });
-      });
-    })
-  ]).then(function(_arg3) {
+build = function(dic, opt, callback) {
+  return compileAll(dic, function(_arg) {
     var css, html, js, pBlobURL, pstyles, styles;
-    js = _arg3[0], html = _arg3[1], css = _arg3[2];
+    js = _arg[0], html = _arg[1], css = _arg[2];
     if ((js.err != null) || (html.err != null) || (css.err != null)) {
       return callback(buildHTML({
         css: "font-family: 'Source Code Pro','Menlo','Monaco','Andale Mono','lucida console','Courier New','monospace';",
@@ -318,19 +393,19 @@ build = function(_arg, _arg1, _arg2, callback) {
       return Promise.all(pstyles).then(function(blobStyles) {
         var pscripts, scripts;
         scripts = [];
-        if (enableJQuery) {
+        if (opt.enableJQuery) {
           scripts.push("thirdparty/jquery/jquery.min.js");
         }
-        if (enableUnderscore) {
+        if (opt.enableUnderscore) {
           scripts.push("thirdparty/underscore.js/underscore-min.js");
         }
-        if (enableES6shim) {
+        if (opt.enableES6shim) {
           scripts.push("thirdparty/es6-shim/es6-shim.min.js");
         }
-        if (enableMathjs) {
+        if (opt.enableMathjs) {
           scripts.push("thirdparty/mathjs/math.min.js");
         }
-        if (enableProcessing) {
+        if (opt.enableProcessing) {
           scripts.push("thirdparty/processing.js/processing.min.js");
         }
         pBlobURL = function(url) {
@@ -346,7 +421,7 @@ build = function(_arg, _arg1, _arg2, callback) {
         return Promise.all(pscripts).then(function(blobScripts) {
           var specials;
           specials = [];
-          if (enableFirebugLite) {
+          if (opt.enableFirebugLite) {
             specials.push(new Promise(function(resolve) {
               return resolve("<script id='FirebugLite' FirebugLite='4' src='https://getfirebug.com/firebug-lite.js'>\n  {\n    overrideConsole:true,\n    showIconWhenHidden:true,\n    startOpened:true,\n    enableTrace:true\n  }\n<" + "/" + "script>");
             }));
@@ -369,15 +444,5 @@ build = function(_arg, _arg1, _arg2, callback) {
         return console.error(err, err.stack);
       });
     }
-  })["catch"](function(err) {
-    return console.error(err, err.stack);
   });
-};
-
-getElmVal = function(elm) {
-  if (elm instanceof HTMLInputElement && $(elm).attr("type") === "checkbox") {
-    return $(elm).is(':checked');
-  } else {
-    return $(elm).val();
-  }
 };
