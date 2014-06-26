@@ -19,19 +19,28 @@ createBlobURL = function(data, mimetype) {
 };
 
 URLToText = function(url, callback) {
-  return $.ajax({
-    url: url,
-    error: function(err) {
-      if (err.status === 200 && err.readyState === 4) {
-        return callback(err.responseText);
-      } else {
-        return console.error(err, err.stack);
-      }
-    },
-    success: function(res) {
-      return callback(res);
+  var xhr;
+  xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onerror = function(err) {
+    throw new Error(err);
+  };
+  xhr.onload = function() {
+    if (this.status === 200 || this.status === 0 && this.readyState === 4) {
+      return callback(this.response);
     }
-  });
+  };
+  return xhr.send();
+
+  /*
+  $.ajax
+    url:url
+    error: (err)->
+      if err.status is 200 and err.readyState is 4 # offline appcache behavior
+      then callback(err.responseText)
+      else console.error(err, err.stack)
+    success: (res)-> callback(res)
+   */
 };
 
 URLToArrayBuffer = function(url, callback) {
@@ -402,40 +411,52 @@ compileAll = function(langs, callback) {
   });
 };
 
-getIncludeScriptURLs = function(opt, cb) {
+getIncludeScriptURLs = function(opt, callback) {
   var urls;
   urls = [];
   if (opt.enableJQuery) {
-    urls.push("thirdparty/jquery/jquery.min.js");
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/jquery/jquery.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"));
   }
   if (opt.enableUnderscore) {
-    urls.push("thirdparty/underscore.js/underscore-min.js");
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/underscore.js/underscore-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"));
   }
   if (opt.enableES6shim) {
-    urls.push("thirdparty/es6-shim/es6-shim.min.js");
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/es6-shim/es6-shim.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.11.0/es6-shim.min.js"));
   }
   if (opt.enableMathjs) {
-    urls.push("thirdparty/mathjs/math.min.js");
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/mathjs/math.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/mathjs/0.23.0/math.min.js"));
   }
   if (opt.enableProcessing) {
-    urls.push("thirdparty/processing.js/processing.min.js");
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/processing.js/processing.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.8/processing.min.js"));
   }
-  return createProxyURLs(urls, "text/javascript", function(_urls) {
-    return cb(_urls);
-  });
+  if (opt.enableCache && opt.enableBlobCache) {
+    return createProxyURLs(urls, "text/javascript", function(_urls) {
+      return callback(_urls);
+    });
+  } else {
+    return setTimeout(function() {
+      return callback(urls);
+    });
+  }
 };
 
-getIncludeStyleURLs = function(opt, cb) {
+getIncludeStyleURLs = function(opt, callback) {
   var urls;
   urls = [];
-  return createProxyURLs(urls, "text/javascript", function(_urls) {
-    return cb(_urls);
-  });
+  if (opt.enableCache && opt.enableBlobCache) {
+    return createProxyURLs(urls, "text/javascript", function(_urls) {
+      return callback(_urls);
+    });
+  } else {
+    return setTimeout(function() {
+      return callback(urls);
+    });
+  }
 };
 
 buildScripts = function(urls) {
   return urls.reduce((function(str, url) {
-    return str + ("<script src='" + url + "'><" + "/" + "script>\"\n");
+    return str + ("<script src='" + url + "'><" + "/" + "script>\n");
   }), "");
 };
 
@@ -453,22 +474,30 @@ buildErr = function(jsResult, htmlResult, cssResult) {
   return "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\" />\n<style>\n*{font-family: 'Source Code Pro','Menlo','Monaco','Andale Mono','lucida console','Courier New','monospace';}\n</style>\n</head>\n<body>\n<pre>\n" + jsResult.lang + "\n" + jsResult.err + "\n\n" + htmlResult.lang + "\n" + htmlResult.err + "\n\n" + cssResult.lang + "\n" + cssResult.err + "\n</pre>\n</body>\n</html>";
 };
 
-includeFirebugLite = function(head, jsResult, htmlResult, cssResult, callback) {
-
-  /*
-    createProxyURLs ["thirdparty/firebug/skin/xp/sprite.png"], "image/png", ([spriteURL])->
-      URLToText "thirdparty/firebug/build/firebug-lite.js", (text)->
-  _text = text
-    .replace("https://getfirebug.com/releases/lite/latest/skin/xp/sprite.png",
-             spriteURL)
-    .replace("var m=path&&path.match(/([^\\/]+)\\/$/)||null;",
-             "var m=['build/', 'build']; path='#{makeURL(location)}thirdparty/firebug/build/'")
-   */
-  var firebugURL;
-  firebugURL = "https://getfirebug.com/firebug-lite.js";
-  jsResult.code = "try{\n  " + jsResult.code + "\n}catch(err){\n  console.error(err, err.stack);\n}";
-  head = "<script id='FirebugLite' FirebugLite='4' src='" + firebugURL + "'>\n  {\n    overrideConsole:true,\n    showIconWhenHidden:true,\n    startOpened:true,\n    enableTrace:true\n  }\n<" + "/" + "script>\n<style>\n  body{\n    margin-bottom: 400px;\n  }\n</style>\n" + head;
-  return callback(head, jsResult, htmlResult, cssResult);
+includeFirebugLite = function(head, jsResult, htmlResult, cssResult, opt, callback) {
+  var caching;
+  caching = function(next) {
+    if (opt.enableCache && opt.enableBlobCache) {
+      return URLToText(makeURL(location) + "thirdparty/firebug/firebug-lite.js", function(text) {
+        var _text;
+        _text = text.replace("var m=path&&path.match(/([^\\/]+)\\/$/)||null;", "var m=['build/', 'build']; path='" + (makeURL(location)) + "thirdparty/firebug/build/'");
+        return next(createBlobURL(_text, "text/javascript"));
+      });
+    } else if (opt.enableCache) {
+      return setTimeout(function() {
+        return next(makeURL(location) + "thirdparty/firebug/firebug-lite.js");
+      });
+    } else {
+      return setTimeout(function() {
+        return next("https://cdnjs.cloudflare.com/ajax/libs/firebug-lite/1.4.0/firebug-lite.js");
+      });
+    }
+  };
+  return caching(function(firebugURL) {
+    jsResult.code = "try{\n  " + jsResult.code + "\n}catch(err){\n  console.error(err, err.stack);\n}";
+    head = "<script id='FirebugLite' FirebugLite='4' src='" + firebugURL + "'>\n  {\n    overrideConsole:true,\n    showIconWhenHidden:true,\n    startOpened:true,\n    enableTrace:true\n  }\n<" + "/" + "script>\n<style>\n  body{\n    margin-bottom: 400px;\n  }\n</style>\n" + head;
+    return callback(head, jsResult, htmlResult, cssResult);
+  });
 };
 
 build = function(_arg, _arg1, opt, callback) {
@@ -505,7 +534,7 @@ build = function(_arg, _arg1, opt, callback) {
               return callback(srcdoc);
             });
           } else {
-            return includeFirebugLite(head, jsResult, htmlResult, cssResult, function(_head, _jsResult, _htmlResult, _cssResult) {
+            return includeFirebugLite(head, jsResult, htmlResult, cssResult, opt, function(_head, _jsResult, _htmlResult, _cssResult) {
               srcdoc = buildHTML(_head, _jsResult, _htmlResult, _cssResult);
               return setTimeout(function() {
                 return callback(srcdoc);

@@ -17,7 +17,8 @@ Config = Backbone.Model.extend({
 Main = Backbone.View.extend({
   el: "#layout",
   events: {
-    "click #setting-project-save": "saveURI"
+    "click #setting-project-save": "saveURI",
+    "click #setting-project-shorten": "shorten"
   },
   saveURI: function() {
     var config, markup, script, style, url, _ref;
@@ -34,9 +35,10 @@ Main = Backbone.View.extend({
     });
     $("#setting-project-url").val(url);
     $("#setting-project-size").html(url.length);
-    $("#setting-project-twitter").html("");
-    history.pushState(null, null, url);
-    return shortenURL(url, (function(_this) {
+    return history.pushState(null, null, url);
+  },
+  shorten: function() {
+    return shortenURL($("#setting-project-url").val(), (function(_this) {
       return function(_url) {
         $("#setting-project-url").val(_url);
         $("#setting-project-twitter").html($("<a />").attr({
@@ -49,6 +51,7 @@ Main = Backbone.View.extend({
           "data-count": "none",
           "data-lang": "en"
         }).html("Tweet"));
+        $("#setting-project-size").html(_url.length);
         return twttr.widgets.load();
       };
     })(this));
@@ -68,10 +71,12 @@ Main = Backbone.View.extend({
     }
   },
   run: function() {
-    var altcss, althtml, altjs, markup, opt, script, style, _ref;
+    var altcss, althtml, altjs, markup, opt, script, style, _obj, _ref;
+    this.saveURI();
     opt = this.model.toJSON();
     altjs = opt.altjs, althtml = opt.althtml, altcss = opt.altcss;
     _ref = this.getValues(), script = _ref.script, markup = _ref.markup, style = _ref.style;
+    _obj = Object.create(opt);
     return build({
       altjs: altjs,
       althtml: althtml,
@@ -80,7 +85,7 @@ Main = Backbone.View.extend({
       script: script,
       markup: markup,
       style: style
-    }, opt, function(srcdoc) {
+    }, _obj, function(srcdoc) {
       var url;
       console.log(url = createBlobURL(srcdoc, (opt.enableViewSource ? "text/plain" : "text/html")));
       return $("#box-sandbox-iframe").attr({

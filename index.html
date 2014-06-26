@@ -37,9 +37,13 @@
                 <input data-config="title" type="text" value="" placeholder="no title">
               </label>
               <p>Save as URL:
-                <input id="setting-project-url" type="url" value="" placeholder="Press Save Button" onclick="this.select();"><span id="setting-project-size"></span>
-                <input id="setting-project-save" type="button" value="Save" class="pure-button pure-button-primary"><span id="setting-project-twitter"></span>
-              </p><a target="_blank" href="#" class="pure-button">New Project</a>
+                <input id="setting-project-url" type="url" value="" placeholder="Press Save Button" onclick="this.select();"><span id="setting-project-size"></span><span id="setting-project-twitter"></span>
+              </p>
+              <p>
+                <input id="setting-project-save" type="button" value="Save" class="pure-button pure-button-primary">
+                <input id="setting-project-shorten" type="button" value="Share" class="pure-button">
+              </p>
+              <p><a target="_blank" href="#" class="pure-button">New Project</a></p>
             </fieldset>
             <fieldset>
               <legend>Compiler</legend>
@@ -75,7 +79,7 @@
               </label>
             </fieldset>
             <fieldset>
-              <legend>Library</legend>
+              <legend>Libraries</legend>
               <label>Firebug-Lite(1.4.0):
                 <input data-config="enableFirebugLite" type="checkbox">
               </label>
@@ -96,11 +100,21 @@
               </label>
             </fieldset>
             <fieldset>
+              <legend>Debug</legend>
+              <label>use cache:
+                <input data-config="enableCache" type="checkbox" checked="checked">
+              </label>
+              <label>use blobCache
+                <input data-config="enableBlobCache" type="checkbox">
+              </label>
+            </fieldset>
+            <fieldset>
               <legend>Support</legend>
               <ul>
                 <li><a target="_blank" href="https://github.com/altjsdoit/altjsdoit">github</a></li>
                 <li><a target="_blank" href="https://github.com/altjsdoit/altjsdoit/issues">github/issues</a></li>
                 <li><a target="_blank" href="https://twitter.com/search?q=%23altjsdoit">twitter/search</a></li>
+                <li><a target="_blank" href="./test.html">test</a></li>
               </ul>
             </fieldset>
           </form>
