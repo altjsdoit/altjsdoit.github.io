@@ -386,7 +386,7 @@ includeFirebugLite = function(head, jsResult, htmlResult, cssResult, opt, callba
       });
     } else {
       return setTimeout(function() {
-        return next("https://cdnjs.cloudflare.com/ajax/libs/firebug-lite/1.4.0/firebug-lite.min.js");
+        return next("https://getfirebug.com/firebug-lite.js");
       });
     }
   };
