@@ -232,13 +232,13 @@ QUnit.asyncTest("compileAll", function(assert) {
 });
 
 QUnit.asyncTest("getIncludeStyleURLs", function(assert) {
-  expect(0);
-  return QUnit.start();
+  QUnit.start();
+  return expect(0);
 });
 
 QUnit.asyncTest("getIncludeScriptURLs", function(assert) {
-  expect(0);
-  return QUnit.start();
+  QUnit.start();
+  return expect(0);
 });
 
 QUnit.test("buildStyles", function(assert) {
@@ -291,58 +291,66 @@ QUnit.asyncTest("zipURI, URIQuery makeURL, shortenURL", function(assert) {
 
 QUnit.module("iframe");
 
-(function() {
-  var script, srcdoc, style;
-  script = "target = (parent.postMessage ? parent : (parent.document.postMessage ? parent.document : undefined))\nif(target) target.postMessage(\"blob: \"+location.href, \"" + location.href + "\");\n  document.write(\"<p>blob</p>\");";
-  srcdoc = "<script type=\"text/javascript\" src=\"https://getfirebug.com/firebug-lite.js\">\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n</script>\n<script src=\"" + (createBlobURL(script, "text/javascript")) + "\"></script>\n<script>\n  try{\n    target = (parent.postMessage ? parent : (parent.document.postMessage ? parent.document : undefined))\n    if(target) target.postMessage(\"inline: \"+location.href, \"" + location.href + "\");\n    document.write(\"<p>inline</p>\");\n    document.write(\"<a target='_blank' href='\"+location.href+\"'>\"+location.href+\"</a>\");\n  }catch(err){console.error(err, err.stack);}\n</script>";
-  style = {
-    height: "400px"
+encodeDataURI("try{\n  window.testResult = window.testResult || {};\n  window.testResult.dataURI = location.href;\n  document.write(\"<p>dataURI</p>\");\n}catch(err){\n  document.write(JSON.stringify(err))\n}", "text/javascript", function(dataURI) {
+  var createSrcdoc, style;
+  createSrcdoc = function(context) {
+    var objectURI, srcdoc;
+    objectURI = createBlobURL("try{\n  window.testResult = window.testResult || {};\n  window.testResult.objectURL = location.href;\n  document.write(\"<p>objectURL</p>\");\n}catch(err){\n  document.write(JSON.stringify(err))\n}", "text/javascript");
+    return srcdoc = "<h2>" + context + "</h2>\n<script type=\"text/javascript\" src=\"https://getfirebug.com/firebug-lite.js\">\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n</script>\n<script src=\"" + dataURI + "\"></script>\n<script src=\"" + objectURI + "\"></script>\n<script>\n  try{\n    window.testResult = window.testResult || {};\n    window.testResult.inline = location.href;\n    window.testResult.context = \"" + context + "\";\n    document.write(\"<p>inline</p>\");\n    document.write(\"<p><a target='_blank' href='\"+location.href+\"'>\"+location.href+\"</a></p>\");\n    target = (parent.postMessage ? parent : (parent.document.postMessage ? parent.document : undefined));\n    target.postMessage(JSON.stringify(window.testResult), \"" + (makeURL(location)) + "\");\n  }catch(err){\n    document.write(JSON.stringify(err))\n  }\n</script>";
   };
-  QUnit.asyncTest("check BlobURL iframe behavior", function(assert) {
-    var $div, blobURLIframe, n;
-    $div = $("<div>").appendTo("body").append(blobURLIframe = $("<iframe />").css(style).attr({
-      "src": createBlobURL(srcdoc, "text/html")
-    })[0]);
-    n = 0;
-    expect(2);
+  style = {
+    height: "400px",
+    width: "400px"
+  };
+  QUnit.asyncTest("check objectURL iframe behavior", function(assert) {
+    var iframe;
+    iframe = $("<iframe />").css(style).attr({
+      "src": createBlobURL(createSrcdoc("objectURL"), "text/html")
+    });
+    $("<div>").append(iframe).appendTo("body");
+    expect(3);
     return window.onmessage = function(ev) {
-      $("<p />").html(ev.data).appendTo($div);
-      assert.ok(true, ev.data);
-      if (++n === 2) {
-        return QUnit.start();
-      }
+      var testResult;
+      testResult = JSON.parse(ev.data);
+      assert.ok(testResult.dataURI, ev.data);
+      assert.ok(testResult.objectURL, ev.data);
+      assert.ok(testResult.inline, ev.data);
+      return QUnit.start();
     };
   });
   QUnit.asyncTest("check srcdoc iframe behavior", function(assert) {
-    var $div, n, srcdocIframe;
-    $div = $("<div>").appendTo("body").append(srcdocIframe = $("<iframe />").css(style).attr({
-      "srcdoc": srcdoc
-    })[0]);
-    n = 0;
-    expect(2);
+    var iframe;
+    iframe = $("<iframe />").css(style).attr({
+      "srcdoc": createSrcdoc("srcdoc")
+    });
+    $("<div>").append(iframe).appendTo("body");
+    expect(3);
     return window.onmessage = function(ev) {
-      $("<p />").html(ev.data).appendTo($div);
-      assert.ok(true, ev.data);
-      if (++n === 2) {
-        return QUnit.start();
-      }
+      var testResult;
+      testResult = JSON.parse(ev.data);
+      assert.ok(testResult.dataURI, ev.data);
+      assert.ok(testResult.objectURL, ev.data);
+      assert.ok(testResult.inline, ev.data);
+      return QUnit.start();
     };
   });
-  return QUnit.asyncTest("check DataURI iframe behavior", function(assert) {
-    return encodeDataURI(srcdoc, "text/html", function(base64) {
-      var $div, base64Iframe, n;
-      $div = $("<div>").appendTo("body").append(base64Iframe = $("<iframe />").css(style).attr({
+  return QUnit.asyncTest("check dataURI iframe behavior", function(assert) {
+    return encodeDataURI(createSrcdoc("dataURI"), "text/html", function(base64) {
+      var iframe;
+      iframe = $("<iframe />").css(style).attr({
         "src": base64
-      })[0]);
-      n = 0;
-      expect(2);
+      });
+      $("<div>").append(iframe).appendTo("body");
+      expect(3);
       return window.onmessage = function(ev) {
-        $("<p />").html(ev.data).appendTo($div);
-        assert.ok(true, ev.data);
-        if (++n === 2) {
-          return QUnit.start();
-        }
+        var testResult;
+        testResult = JSON.parse(ev.data);
+        assert.ok(testResult.dataURI, "dataURI");
+        assert.ok(testResult.objectURL, "objectURL");
+        console.log(testResult.objectURL);
+        assert.ok(testResult.inline, "inline");
+        return QUnit.start();
       };
     });
   });
-})();
+});
