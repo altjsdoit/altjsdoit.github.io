@@ -100,6 +100,13 @@ QUnit.asyncTest("encodeDataURI, decodeDataURI", function(assert) {
   });
 });
 
+QUnit.test("makeDomain", function(assert) {
+  var url;
+  expect(1);
+  url = makeDomain(location);
+  return assert.ok(typeof url === "string", url);
+});
+
 QUnit.test("makeURL", function(assert) {
   expect(1);
   return assert.strictEqual(makeURL(location) + location.search + location.hash, location.href);
@@ -224,7 +231,6 @@ QUnit.asyncTest("compileAll", function(assert) {
     results.forEach(function(_arg, i) {
       var code, err;
       err = _arg.err, code = _arg.code;
-      console.log(err);
       return assert.ok(JSON.stringify(err).length > 10, langs[i].lang + ": " + JSON.stringify(err) + " : " + code);
     });
     return QUnit.start();
@@ -232,39 +238,115 @@ QUnit.asyncTest("compileAll", function(assert) {
 });
 
 QUnit.asyncTest("getIncludeStyleURLs", function(assert) {
-  QUnit.start();
-  return expect(0);
+  expect(1);
+  return getIncludeStyleURLs({}, function(urls) {
+    assert.strictEqual(urls.length, 0, JSON.stringify(urls));
+    return QUnit.start();
+  });
 });
 
 QUnit.asyncTest("getIncludeScriptURLs", function(assert) {
-  QUnit.start();
-  return expect(0);
-});
-
-QUnit.test("buildStyles", function(assert) {
-  return expect(0);
+  expect(3);
+  return getIncludeScriptURLs({
+    enableZepto: true
+  }, function(urls) {
+    assert.deepEqual(urls, ["https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"], JSON.stringify(urls));
+    return getIncludeScriptURLs({
+      enableJQuery: true,
+      enableCache: true
+    }, function(urls) {
+      assert.deepEqual(urls, [makeDomain(location) + "/" + "thirdparty/jquery/jquery.min.js"], JSON.stringify(urls));
+      return getIncludeScriptURLs({
+        enableUnderscore: true,
+        enableCache: true,
+        enableBlobCache: true
+      }, function(urls) {
+        return URLToText(urls[0], function(_text) {
+          return URLToText(makeDomain(location) + "/" + "thirdparty/underscore.js/underscore-min.js", function(text) {
+            assert.strictEqual(_text, text, _text);
+            return QUnit.start();
+          });
+        });
+      });
+    });
+  });
 });
 
 QUnit.test("buildScripts", function(assert) {
-  return expect(0);
+  var tags;
+  expect(1);
+  tags = buildScripts(["hoge.js", "huga.js"]);
+  return assert.strictEqual(tags, "<script src='hoge.js'></script>\n<script src='huga.js'></script>\n", tags);
+});
+
+QUnit.test("buildStyles", function(assert) {
+  var tags;
+  expect(1);
+  tags = buildStyles(["hoge.css", "huga.css"]);
+  return assert.strictEqual(tags, "<link rel='stylesheet' href='hoge.css' />\n<link rel='stylesheet' href='huga.css' />\n", tags);
 });
 
 QUnit.test("buildHTML", function(assert) {
-  return expect(0);
+  var srcdoc;
+  expect(1);
+  srcdoc = buildHTML("", {
+    code: ""
+  }, {
+    code: ""
+  }, {
+    code: ""
+  });
+  return assert.ok(srcdoc, srcdoc);
 });
 
 QUnit.test("buildErr", function(assert) {
-  return expect(0);
+  var a, srcdoc;
+  expect(1);
+  a = {
+    lang: "",
+    code: ""
+  };
+  srcdoc = buildErr(a, a, a);
+  return assert.ok(srcdoc, srcdoc);
 });
 
 QUnit.asyncTest("includeFirebugLite", function(assert) {
-  expect(0);
-  return QUnit.start();
+  var a;
+  expect(1);
+  a = {
+    lang: "",
+    code: ""
+  };
+  return includeFirebugLite("", a, a, a, {}, function() {
+    assert.ok(true, JSON.stringify(arguments));
+    return QUnit.start();
+  });
 });
 
 QUnit.asyncTest("build", function(assert) {
-  expect(0);
-  return QUnit.start();
+  var code, lang, opt;
+  expect(1);
+  lang = {
+    altjs: "JavaScript",
+    althtml: "HTML",
+    altcss: "CSS"
+  };
+  code = {
+    script: "",
+    markup: "",
+    style: ""
+  };
+  opt = {};
+  return build(lang, code, opt, function(srcdoc) {
+    assert.strictEqual(srcdoc, buildHTML("", {
+      code: ""
+    }, {
+      code: ""
+    }, {
+      code: ""
+    }), srcdoc);
+    return QUnit.start();
+  });
 });
 
 QUnit.module("Complex");
@@ -347,7 +429,6 @@ encodeDataURI("try{\n  window.testResult = window.testResult || {};\n  window.te
         testResult = JSON.parse(ev.data);
         assert.ok(testResult.dataURI, "dataURI");
         assert.ok(testResult.objectURL, "objectURL");
-        console.log(testResult.objectURL);
         assert.ok(testResult.inline, "inline");
         return QUnit.start();
       };

@@ -1,4 +1,4 @@
-var URLToArrayBuffer, URLToText, build, buildErr, buildHTML, buildScripts, buildStyles, compileAll, createBlobURL, createProxyURLs, decodeDataURI, decodeURIQuery, dir, encodeDataURI, encodeURIQuery, expandURL, getCompilerSetting, getElmVal, getIncludeScriptURLs, getIncludeStyleURLs, includeFirebugLite, log, makeURL, shortenURL, unzipDataURI, zipDataURI;
+var URLToArrayBuffer, URLToText, build, buildErr, buildHTML, buildScripts, buildStyles, compileAll, createBlobURL, createProxyURLs, decodeDataURI, decodeURIQuery, dir, encodeDataURI, encodeURIQuery, expandURL, getCompilerSetting, getElmVal, getIncludeScriptURLs, getIncludeStyleURLs, includeFirebugLite, log, makeDomain, makeURL, shortenURL, unzipDataURI, zipDataURI;
 
 window.URL = window.URL || window.webkitURL || window.mozURL;
 
@@ -98,8 +98,12 @@ decodeDataURI = function(dataURI, callback) {
   };
 };
 
+makeDomain = function(location) {
+  return location.protocol + '//' + location.hostname + (location.port ? ":" + location.port : "");
+};
+
 makeURL = function(location) {
-  return location.protocol + '//' + location.hostname + (location.port ? ":" + location.port : "") + location.pathname;
+  return makeDomain(location) + location.pathname;
 };
 
 encodeURIQuery = function(dic) {
@@ -136,8 +140,11 @@ shortenURL = function(url, callback) {
     }),
     dataType: 'json',
     success: function(res) {
-      console.info(res);
-      return callback(res.id);
+      if (res.longUrl === url) {
+        return callback(res.id);
+      } else {
+        return console.error("url shorten failed. ", res);
+      }
     },
     error: function(err) {
       return console.error(err, err.stack);
@@ -149,8 +156,11 @@ expandURL = function(url, callback) {
   return $.ajax({
     url: "https://www.googleapis.com/urlshortener/v1/url?shortUrl=" + url,
     success: function(res) {
-      console.info(res);
-      return callback(res.longUrl);
+      if (res.longUrl) {
+        return callback(res.longUrl);
+      } else {
+        return console.error("url expand failed", res);
+      }
     },
     error: function(err) {
       return console.error(err, err.stack);
@@ -306,25 +316,25 @@ getIncludeScriptURLs = function(opt, callback) {
   var urls;
   urls = [];
   if (opt.enableZepto) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/zepto/zepto.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/zepto/zepto.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"));
   }
   if (opt.enableJQuery) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/jquery/jquery.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/jquery/jquery.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"));
   }
   if (opt.enableUnderscore) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/underscore.js/underscore-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/underscore.js/underscore-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"));
   }
   if (opt.enableBackbone) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/backbone.js/backbone-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/backbone.js/backbone-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"));
   }
   if (opt.enableES6shim) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/es6-shim/es6-shim.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.11.0/es6-shim.min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/es6-shim/es6-shim.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.11.0/es6-shim.min.js"));
   }
   if (opt.enableMathjs) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/mathjs/math.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/mathjs/0.23.0/math.min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/mathjs/math.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/mathjs/0.23.0/math.min.js"));
   }
   if (opt.enableProcessing) {
-    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/processing.js/processing.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.8/processing.min.js"));
+    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/processing.js/processing.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.8/processing.min.js"));
   }
   if (opt.enableCache && opt.enableBlobCache) {
     return createProxyURLs(urls, "text/javascript", function(_urls) {
@@ -375,14 +385,14 @@ includeFirebugLite = function(head, jsResult, htmlResult, cssResult, opt, callba
   var caching;
   caching = function(next) {
     if (opt.enableCache && opt.enableBlobCache) {
-      return URLToText(makeURL(location) + "thirdparty/firebug/firebug-lite.js", function(text) {
+      return URLToText(makeDomain(location) + "/" + "thirdparty/firebug/firebug-lite.js", function(text) {
         var _text;
-        _text = text.replace("var m=path&&path.match(/([^\\/]+)\\/$/)||null;", "var m=['build/', 'build']; path='" + (makeURL(location)) + "thirdparty/firebug/build/'");
+        _text = text.replace("var m=path&&path.match(/([^\\/]+)\\/$/)||null;", "var m=['build/', 'build']; path='" + (makeDomain(location)) + "/thirdparty/firebug/build/'");
         return next(createBlobURL(_text, "text/javascript"));
       });
     } else if (opt.enableCache) {
       return setTimeout(function() {
-        return next(makeURL(location) + "thirdparty/firebug/firebug-lite.js");
+        return next(makeDomain(location) + "/" + "thirdparty/firebug/firebug-lite.js");
       });
     } else {
       return setTimeout(function() {
