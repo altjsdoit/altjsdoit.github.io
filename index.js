@@ -116,6 +116,8 @@ Main = Backbone.View.extend({
       el: $("#box-altcss-textarea")[0],
       type: "altcss"
     });
+    this.setting.updateAll();
+    this.loadURI();
     this.scriptEd.onsave = this.markupEd.onsave = this.styleEd.onsave = (function(_this) {
       return function() {
         return _this.saveURI();
@@ -126,8 +128,6 @@ Main = Backbone.View.extend({
         return _this.run();
       };
     })(this);
-    this.setting.updateAll();
-    this.loadURI();
     $("#menu-altjs").click((function(_this) {
       return function() {
         return setTimeout(function() {
@@ -207,7 +207,7 @@ Setting = Backbone.View.extend({
   updateAll: function() {
     var config;
     config = {};
-    $(this.el).find("[data-config]").each(function(a, b) {
+    $(this.el).find("[data-config]").each(function(i, v) {
       return config[$(this).attr("data-config")] = getElmVal(this);
     });
     return this.model.set(config);
@@ -217,24 +217,25 @@ Setting = Backbone.View.extend({
   },
   initialize: function() {
     _.bindAll(this, "render");
+    _.bindAll(this, "update");
+    _.bindAll(this, "updateAll");
     this.model.bind("change", this.render);
     return this.render();
   },
   render: function() {
-    var altcss, althtml, altjs, enableCodeMirror, enableES6shim, enableFirebugLite, enableJQuery, enableMathjs, enableProcessing, enableUnderscore, enableViewSource, title, _ref;
-    _ref = this.model.toJSON(), title = _ref.title, altjs = _ref.altjs, althtml = _ref.althtml, altcss = _ref.altcss, enableCodeMirror = _ref.enableCodeMirror, enableViewSource = _ref.enableViewSource, enableJQuery = _ref.enableJQuery, enableUnderscore = _ref.enableUnderscore, enableES6shim = _ref.enableES6shim, enableFirebugLite = _ref.enableFirebugLite, enableProcessing = _ref.enableProcessing, enableMathjs = _ref.enableMathjs;
-    this.$el.find("[data-config='title']").val(title);
-    this.$el.find("[data-config='altjs']").val(altjs);
-    this.$el.find("[data-config='althtml']").val(althtml);
-    this.$el.find("[data-config='altcss']").val(altcss);
-    this.$el.find("[data-config='enableCodeMirror']").attr("checked", enableCodeMirror);
-    this.$el.find("[data-config='enableViewSource']").attr("checked", enableViewSource);
-    this.$el.find("[data-config='enableFirebugLite']").attr("checked", enableFirebugLite);
-    this.$el.find("[data-config='enableJQuery']").attr("checked", enableJQuery);
-    this.$el.find("[data-config='enableUnderscore']").attr("checked", enableUnderscore);
-    this.$el.find("[data-config='enableES6shim']").attr("checked", enableES6shim);
-    this.$el.find("[data-config='enableProcessing']").attr("checked", enableProcessing);
-    return this.$el.find("[data-config='enableMathjs']").attr("checked", enableMathjs);
+    var opt;
+    opt = this.model.toJSON();
+    return $(this.el).find("[data-config]").each((function(_this) {
+      return function(i, v) {
+        var key;
+        key = $(v).attr("data-config");
+        if (key.slice(0, 6) === "enable") {
+          return _this.$el.find("[data-config='" + key + "']").attr("checked", opt[key]);
+        } else {
+          return _this.$el.find("[data-config='" + key + "']").val(opt[key]);
+        }
+      };
+    })(this));
   }
 });
 
