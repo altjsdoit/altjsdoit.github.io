@@ -314,6 +314,9 @@ getIncludeScriptURLs = function(opt, callback) {
   if (opt.enableUnderscore) {
     urls.push((opt.enableCache ? makeURL(location) + "thirdparty/underscore.js/underscore-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"));
   }
+  if (opt.enableBackbone) {
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/backbone.js/backbone-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"));
+  }
   if (opt.enableES6shim) {
     urls.push((opt.enableCache ? makeURL(location) + "thirdparty/es6-shim/es6-shim.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.11.0/es6-shim.min.js"));
   }
@@ -383,7 +386,7 @@ includeFirebugLite = function(head, jsResult, htmlResult, cssResult, opt, callba
       });
     } else {
       return setTimeout(function() {
-        return next("https://getfirebug.com/firebug-lite.js");
+        return next("https://cdnjs.cloudflare.com/ajax/libs/firebug-lite/1.4.0/firebug-lite.min.js");
       });
     }
   };
