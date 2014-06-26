@@ -1,7 +1,7 @@
 var Config, Editor, Main, Menu, Setting;
 
 $(function() {
-  return new Main;
+  return window.bbmain = new Main;
 });
 
 Config = Backbone.Model.extend({

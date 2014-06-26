@@ -305,6 +305,9 @@ compileAll = function(langs, callback) {
 getIncludeScriptURLs = function(opt, callback) {
   var urls;
   urls = [];
+  if (opt.enableZepto) {
+    urls.push((opt.enableCache ? makeURL(location) + "thirdparty/zepto/zepto.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"));
+  }
   if (opt.enableJQuery) {
     urls.push((opt.enableCache ? makeURL(location) + "thirdparty/jquery/jquery.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"));
   }
