@@ -244,8 +244,8 @@ Setting = Backbone.View.extend({
       return function(i, v) {
         var key;
         key = $(v).attr("data-config");
-        if (key.slice(0, 6) === "enable") {
-          return _this.$el.find("[data-config='" + key + "']").attr("checked", opt[key]);
+        if ((opt[key] != null) && key.slice(0, 6) === "enable") {
+          return _this.$el.find("[data-config='" + key + "']").attr("checked", opt[key] ? "checked" : null);
         } else {
           return _this.$el.find("[data-config='" + key + "']").val(opt[key]);
         }
