@@ -223,7 +223,18 @@ Setting = Backbone.View.extend({
   render: function() {
     var altcss, althtml, altjs, enableCodeMirror, enableES6shim, enableFirebugLite, enableJQuery, enableMathjs, enableProcessing, enableUnderscore, enableViewSource, title, _ref;
     _ref = this.model.toJSON(), title = _ref.title, altjs = _ref.altjs, althtml = _ref.althtml, altcss = _ref.altcss, enableCodeMirror = _ref.enableCodeMirror, enableViewSource = _ref.enableViewSource, enableJQuery = _ref.enableJQuery, enableUnderscore = _ref.enableUnderscore, enableES6shim = _ref.enableES6shim, enableFirebugLite = _ref.enableFirebugLite, enableProcessing = _ref.enableProcessing, enableMathjs = _ref.enableMathjs;
-    return this.$el.find("[data-config='title']").val(title).end().find("[data-config='altjs']").val(altjs).end().find("[data-config='althtml']").val(althtml).end().find("[data-config='altcss']").val(altcss).end().find("[data-config='enableCodeMirror']").attr("checked", enableCodeMirror).end().find("[data-config='enableViewSource']").attr("checked", enableViewSource).end().find("[data-config='enableFirebugLite']").attr("checked", enableFirebugLite).end().find("[data-config='enableJQuery']").attr("checked", enableJQuery).end().find("[data-config='enableUnderscore']").attr("checked", enableUnderscore).end().find("[data-config='enableES6shim']").attr("checked", enableES6shim).end().find("[data-config='enableProcessing']").attr("checked", enableProcessing).end().find("[data-config='enableMathjs']").attr("checked", enableMathjs).end();
+    this.$el.find("[data-config='title']").val(title);
+    this.$el.find("[data-config='altjs']").val(altjs);
+    this.$el.find("[data-config='althtml']").val(althtml);
+    this.$el.find("[data-config='altcss']").val(altcss);
+    this.$el.find("[data-config='enableCodeMirror']").attr("checked", enableCodeMirror);
+    this.$el.find("[data-config='enableViewSource']").attr("checked", enableViewSource);
+    this.$el.find("[data-config='enableFirebugLite']").attr("checked", enableFirebugLite);
+    this.$el.find("[data-config='enableJQuery']").attr("checked", enableJQuery);
+    this.$el.find("[data-config='enableUnderscore']").attr("checked", enableUnderscore);
+    this.$el.find("[data-config='enableES6shim']").attr("checked", enableES6shim);
+    this.$el.find("[data-config='enableProcessing']").attr("checked", enableProcessing);
+    return this.$el.find("[data-config='enableMathjs']").attr("checked", enableMathjs);
   }
 });
 

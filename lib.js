@@ -22,8 +22,9 @@ URLToText = function(url, callback) {
   var xhr;
   xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
+  xhr.responseType = 'text';
   xhr.onerror = function(err) {
-    throw new Error(err);
+    throw new Error(JSON.strigify(err));
   };
   xhr.onload = function() {
     if (this.status === 200 || this.status === 0 && this.readyState === 4) {
@@ -31,16 +32,6 @@ URLToText = function(url, callback) {
     }
   };
   return xhr.send();
-
-  /*
-  $.ajax
-    url:url
-    error: (err)->
-      if err.status is 200 and err.readyState is 4 # offline appcache behavior
-      then callback(err.responseText)
-      else console.error(err, err.stack)
-    success: (res)-> callback(res)
-   */
 };
 
 URLToArrayBuffer = function(url, callback) {
@@ -60,18 +51,17 @@ URLToArrayBuffer = function(url, callback) {
 };
 
 createProxyURLs = function(urls, mimetype, callback) {
-  var promises;
-  promises = urls.map(function(url) {
-    return new Promise(function(resolve) {
-      return URLToArrayBuffer(url, function(arrayBuffer) {
-        return resolve(createBlobURL(arrayBuffer, mimetype));
-      });
+  var n, _urls;
+  n = 0;
+  _urls = [];
+  return urls.forEach(function(url, i) {
+    n++;
+    return URLToArrayBuffer(url, function(arrayBuffer) {
+      _urls[i] = createBlobURL(arrayBuffer, mimetype);
+      if (--n === 0) {
+        return callback(_urls);
+      }
     });
-  });
-  return Promise.all(promises).then(function(_urls) {
-    return callback(_urls);
-  })["catch"](function(err) {
-    return console.error(err, err.stack);
   });
 };
 
@@ -227,104 +217,6 @@ getCompilerSetting = function(lang) {
           return cb(null, _code);
         });
       });
-    case "TypeScript":
-      return f("javascript", function(code, cb) {
-        var current, diagnostics, err, filename, iter, output, snapshot, source, _compiler;
-        filename = "jsdo.it.ts";
-        source = code;
-        _compiler = new TypeScript.TypeScriptCompiler(filename);
-        snapshot = TypeScript.ScriptSnapshot.fromString(source);
-        _compiler.addFile(filename, snapshot);
-        iter = _compiler.compile();
-        output = '';
-        while (iter.moveNext()) {
-          current = iter.current().outputFiles[0];
-          output += !!current ? current.text : '';
-        }
-        diagnostics = _compiler.getSemanticDiagnostics(filename);
-        if (diagnostics.length) {
-          err = diagnostics.map(function(d) {
-            return d.text();
-          }).join("\n");
-          if (!output) {
-            throw new Error(err);
-          }
-          console.error(err);
-        }
-        return setTimeout(function() {
-          return cb(null, output);
-        });
-      });
-    case "TypedCoffeeScript":
-      return f("coffeescript", function(code, cb) {
-        var jsAST, jsCode, parsed, preprocessed;
-        preprocessed = TypedCoffeeScript.Preprocessor.process(code);
-        parsed = TypedCoffeeScript.Parser.parse(preprocessed, {
-          raw: null,
-          inputSource: null,
-          optimise: null
-        });
-        TypedCoffeeScript.TypeWalker.checkNodes(parsed);
-        TypedCoffeeScript.reporter.clean();
-        TypedCoffeeScript.TypeWalker.checkNodes(parsed);
-        if (TypedCoffeeScript.reporter.has_errors()) {
-          console.error(TypedCoffeeScript.reporter.report());
-          TypedCoffeeScript.reporter.clean();
-        }
-        jsAST = TypedCoffeeScript.Compiler.compile(parsed, {
-          bare: true
-        }).toBasicObject();
-        jsCode = escodegen.generate(jsAST);
-        return setTimeout(function() {
-          return cb(null, jsCode);
-        });
-      });
-    case "Traceur":
-      return f("javascript", function(code, cb) {
-        var project, reporter, _code;
-        reporter = new traceur.util.ErrorReporter();
-        reporter.reportMessageInternal = function(location, kind, format, args) {
-          throw new Error(traceur.util.ErrorReporter.format(location, format, args));
-        };
-        project = new traceur.semantics.symbols.Project(location.href);
-        project.addFile(new traceur.syntax.SourceFile('a.js', code));
-        _code = traceur.outputgeneration.ProjectWriter.write(traceur.codegeneration.Compiler.compile(reporter, project, false));
-        return setTimeout(function() {
-          return cb(null, _code);
-        });
-      });
-    case "LiveScript":
-      return f("coffeescript", function(code, cb) {
-        var _code;
-        _code = LiveScript.compile(code);
-        return setTimeout(function() {
-          return cb(null, _code);
-        });
-      });
-    case "GorillaScript":
-      return f("coffeescript", function(code, cb) {
-        var _code;
-        _code = GorillaScript.compileSync(code).code;
-        return setTimeout(function() {
-          return cb(null, _code);
-        });
-      });
-    case "Wisp":
-      return f("clojure", function(code, cb) {
-        var result;
-        result = wisp.compiler.compile(code);
-        return setTimeout(function() {
-          return cb(result.error, result.code);
-        });
-      });
-    case "LispyScript":
-      return f("scheme", function(code, cb) {
-        var _code;
-        _code = lispyscript._compile(code);
-        return setTimeout(function() {
-          return cb(null, _code);
-        });
-      });
     case "HTML":
       return f("xml", function(code, cb) {
         return setTimeout(function() {
@@ -375,39 +267,38 @@ getCompilerSetting = function(lang) {
 };
 
 compileAll = function(langs, callback) {
-  var compile, promises;
-  compile = function(lang, code) {
-    var compilerFn;
+  var n, next, results;
+  n = 0;
+  results = [];
+  next = function(result, i) {
+    results[i] = result;
+    if (--n === 0) {
+      return callback(results);
+    }
+  };
+  return langs.forEach(function(_arg, i) {
+    var code, compilerFn, err, lang;
+    lang = _arg.lang, code = _arg.code;
+    n++;
     compilerFn = getCompilerSetting(lang).compile;
-    return new Promise(function(resolve) {
-      var err;
-      try {
-        return compilerFn(code, function(err, code) {
-          return resolve({
-            lang: lang,
-            err: err,
-            code: code
-          });
-        });
-      } catch (_error) {
-        err = _error;
-        return resolve({
+    try {
+      return compilerFn(code, function(err, code) {
+        return next({
           lang: lang,
           err: err,
           code: code
-        });
-      }
-    });
-  };
-  promises = langs.map(function(_arg) {
-    var code, lang;
-    lang = _arg.lang, code = _arg.code;
-    return compile(lang, code);
-  });
-  return Promise.all(promises).then(function(results) {
-    return callback(results);
-  })["catch"](function(err) {
-    return console.error(err, err.stack);
+        }, i);
+      });
+    } catch (_error) {
+      err = _error;
+      return setTimeout(function() {
+        return next({
+          lang: lang,
+          err: err,
+          code: code
+        }, i);
+      });
+    }
   });
 };
 
@@ -489,7 +380,7 @@ includeFirebugLite = function(head, jsResult, htmlResult, cssResult, opt, callba
       });
     } else {
       return setTimeout(function() {
-        return next("https://cdnjs.cloudflare.com/ajax/libs/firebug-lite/1.4.0/firebug-lite.js");
+        return next("https://getfirebug.com/firebug-lite.js");
       });
     }
   };
