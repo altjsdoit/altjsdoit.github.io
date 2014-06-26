@@ -17,8 +17,7 @@ Config = Backbone.Model.extend({
 Main = Backbone.View.extend({
   el: "#layout",
   events: {
-    "click #setting-project-save": "saveURI",
-    "click #setting-project-shorten": "shorten"
+    "click #setting-project-save": "saveAndShorten"
   },
   saveURI: function() {
     var config, markup, script, style, url, _ref;
@@ -37,7 +36,8 @@ Main = Backbone.View.extend({
     $("#setting-project-size").html(url.length);
     return history.pushState(null, null, url);
   },
-  shorten: function() {
+  saveAndShorten: function() {
+    this.saveURI();
     return shortenURL($("#setting-project-url").val(), (function(_this) {
       return function(_url) {
         $("#setting-project-url").val(_url);
