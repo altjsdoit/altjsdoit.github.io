@@ -10,7 +10,8 @@ Config = Backbone.Model.extend({
     title: "no name",
     altjs: "JavaScript",
     althtml: "HTML",
-    altcss: "CSS"
+    altcss: "CSS",
+    iframeType: "blob"
   }
 });
 
@@ -71,12 +72,12 @@ Main = Backbone.View.extend({
     }
   },
   run: function() {
-    var altcss, althtml, altjs, markup, opt, script, style, _obj, _ref;
+    var altcss, althtml, altjs, markup, opt, script, style, _opt, _ref;
     this.saveURI();
     opt = this.model.toJSON();
     altjs = opt.altjs, althtml = opt.althtml, altcss = opt.altcss;
     _ref = this.getValues(), script = _ref.script, markup = _ref.markup, style = _ref.style;
-    _obj = Object.create(opt);
+    _opt = Object.create(opt);
     return build({
       altjs: altjs,
       althtml: althtml,
@@ -85,12 +86,27 @@ Main = Backbone.View.extend({
       script: script,
       markup: markup,
       style: style
-    }, _obj, function(srcdoc) {
+    }, _opt, function(srcdoc) {
       var url;
-      console.log(url = createBlobURL(srcdoc, (opt.enableViewSource ? "text/plain" : "text/html")));
-      return $("#box-sandbox-iframe").attr({
-        "src": url
-      });
+      switch (_opt.iframeType) {
+        case "srcdoc":
+          return $("#box-sandbox-iframe").attr({
+            "srcdoc": srcdoc
+          });
+        case "base64":
+          return encodeDataURI(srcdoc, "text/html", function(base64) {
+            return $("#box-sandbox-iframe").attr({
+              "src": base64
+            });
+          });
+        case "blob":
+          console.log(url = createBlobURL(srcdoc, (opt.enableViewSource ? "text/plain" : "text/html")));
+          return $("#box-sandbox-iframe").attr({
+            "src": url
+          });
+        default:
+          throw new Error(_opt.iframeType);
+      }
     });
   },
   initialize: function() {
@@ -173,10 +189,9 @@ Main = Backbone.View.extend({
     };
   },
   render: function() {
-    var d, timestamp, title, _ref;
+    var timestamp, title, _ref;
     _ref = this.model.toJSON(), title = _ref.title, timestamp = _ref.timestamp;
-    d = new Date(timestamp);
-    return $("title").html(title + (" - " + d + " - altjsdo.it"));
+    return $("title").html(title + (" - " + (new Date(timestamp)) + " - altjsdo.it"));
   }
 });
 
@@ -229,6 +244,7 @@ Setting = Backbone.View.extend({
       return function(i, v) {
         var key;
         key = $(v).attr("data-config");
+        console.log(key, opt[key]);
         if (key.slice(0, 6) === "enable") {
           return _this.$el.find("[data-config='" + key + "']").attr("checked", opt[key]);
         } else {
