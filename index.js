@@ -31,16 +31,18 @@ Main = Backbone.View.extend({
         script: script,
         markup: markup,
         style: style
-      })
+      }),
+      date: this.model.get("timestamp") || null,
+      parent: this.model.get("commit") || null
     });
     $("#setting-project-url").val(url);
-    $("#setting-project-size").html(url.length);
     return history.pushState(null, null, url);
   },
   saveAndShorten: function() {
     this.saveURI();
     return shortenURL($("#setting-project-url").val(), (function(_this) {
       return function(_url) {
+        _this.model.set("commit", _url);
         $("#setting-project-url").val(_url);
         $("#setting-project-twitter").html($("<a />").attr({
           "href": "https://twitter.com/share",
@@ -52,7 +54,6 @@ Main = Backbone.View.extend({
           "data-count": "none",
           "data-lang": "en"
         }).html("Tweet"));
-        $("#setting-project-size").html(_url.length);
         return twttr.widgets.load();
       };
     })(this));
@@ -240,6 +241,9 @@ Setting = Backbone.View.extend({
   render: function() {
     var opt;
     opt = this.model.toJSON();
+    if (opt.commit != null) {
+      $("#setting-project-parent").html("<a class='pure-button' target='_blank' href='" + opt.commit + "'>Go Back</a>");
+    }
     return $(this.el).find("[data-config]").each((function(_this) {
       return function(i, v) {
         var key;
