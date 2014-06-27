@@ -116,27 +116,27 @@ code {
   }
 }
 @media (min-width: 640px) {
-  #layout {
-    padding-left: 160px;
-    /* left col width "#menu" */
-    left: 0;
-  }
-  #menu {
-    left: 160px;
-  }
-  #main > * {
-    left: 0px;
-  }
-  #main > * {
-    left: 160px;
-    width: -webkit-calc(100% - 160px);
-  }
-  .menu-link {
-    position: fixed;
-    left: 160px;
-    display: none;
-  }
-  #layout.active .menu-link {
-    left: 160px;
-  }
+  /*
+    #layout {
+        padding-left: 160px;
+        left: 0;
+    }
+    #menu {
+        left: 160px;
+    }
+    #main>* {
+      left: 0px;
+    }
+    #main>*{
+      left: 160px;
+      width: ~'-webkit-calc(100% - 160px)';
+    }
+    .menu-link {
+        position: fixed;
+        left: 160px;
+        display: none;
+    }
+    #layout.active .menu-link {
+        left: 160px;
+    }*/
 }
