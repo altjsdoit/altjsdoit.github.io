@@ -354,7 +354,6 @@ Editor = Backbone.View.extend({
     };
     this.cm = CodeMirror.fromTextArea($("#box-editor-textarea")[0], this.option);
     this.originDoc = this.cm.swapDoc(this.doc.script);
-    this.cm.setSize("100%", "100%");
     return this.render();
   },
   setValues: function(_arg) {
@@ -385,6 +384,7 @@ Editor = Backbone.View.extend({
     tmp.find("[data-tab='markup']").html(opt.althtml);
     tmp.find("[data-tab='style']").html(opt.altcss);
     if (this.enableCodeMirror) {
+      this.cm.setSize("100%", "100%");
       if ((_ref = this.cm) != null) {
         _ref.swapDoc(this.doc[this.selected]);
       }
