@@ -20,7 +20,6 @@ Main = (function() {
     uriData = loadURI(location);
     this.model = new Model();
     this.model.set(_.extend(config, uriData.config));
-    console.dir(this.model.toJSON());
     this.config = new Config({
       model: this.model
     });
@@ -28,7 +27,7 @@ Main = (function() {
       model: this.model
     });
     this.editor.setValues({
-      script: uriData.script || "alert('hello world');",
+      script: uriData.script || "console.log('hello world');",
       markup: uriData.markup || "<p class='helloworld'>hello world</p>",
       style: uriData.style || ".helloworld { color: gray; }"
     });
@@ -38,7 +37,8 @@ Main = (function() {
       };
     })(this));
     $("#config-project-save").click((function(_this) {
-      return function() {
+      return function(ev) {
+        ev.preventDefault();
         _this.saveURI();
         return _this.shareURI();
       };
@@ -51,6 +51,7 @@ Main = (function() {
     $("#menu-page-tab li").click((function(_this) {
       return function(ev) {
         var target;
+        ev.preventDefault();
         $("#menu").find(".selected").removeClass("selected");
         $(ev.target).addClass("selected");
         $("#main").find(".active").removeClass("active");
@@ -173,7 +174,7 @@ Model = Backbone.Model.extend({
 Config = Backbone.View.extend({
   el: "#box-config",
   events: {
-    "change selected": "load",
+    "change select": "load",
     "change input": "load"
   },
   load: function(ev) {
@@ -229,6 +230,7 @@ Editor = Backbone.View.extend({
   },
   selectTab: function(ev) {
     var selected;
+    ev.preventDefault();
     $(this.el).find(".selected").removeClass("selected");
     $(ev.target).addClass("selected");
     selected = $(ev.target).attr("data-tab");

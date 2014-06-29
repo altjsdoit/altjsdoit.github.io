@@ -352,27 +352,33 @@ getIncludeScriptURLs = function(opt, callback) {
   var urls;
   urls = [];
   if (opt.enableZepto) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/zepto/zepto.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/zepto/zepto.min.js");
   }
   if (opt.enableJQuery) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/jquery/jquery.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/jquery/jquery.min.js");
   }
   if (opt.enableUnderscore) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/underscore.js/underscore-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/underscore.js/underscore-min.js");
   }
   if (opt.enableBackbone) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/backbone.js/backbone-min.js" : "https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/backbone.js/backbone-min.js");
   }
   if (opt.enableES6shim) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/es6-shim/es6-shim.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.11.0/es6-shim.min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/es6-shim/es6-shim.min.js");
   }
   if (opt.enableMathjs) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/mathjs/math.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/mathjs/0.23.0/math.min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/mathjs/math.min.js");
   }
   if (opt.enableProcessing) {
-    urls.push((opt.enableCache ? makeDomain(location) + "/" + "thirdparty/processing.js/processing.min.js" : "https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.8/processing.min.js"));
+    urls.push(makeDomain(location) + "/" + "thirdparty/processing.js/processing.min.js");
   }
-  if (opt.enableCache && opt.enableBlobCache) {
+  if (opt.enableChartjs) {
+    urls.push(makeDomain(location) + "/" + "thirdparty/Chart.js/Chart.min.js");
+  }
+  if (opt.enableMathjax) {
+    urls.push(makeDomain(location) + "/" + "thirdparty/mathjax/MathJax.js");
+  }
+  if (opt.enableBlobCache) {
     return createProxyURLs(urls, "text/javascript", function(_urls) {
       return callback(_urls);
     });
@@ -386,7 +392,10 @@ getIncludeScriptURLs = function(opt, callback) {
 getIncludeStyleURLs = function(opt, callback) {
   var urls;
   urls = [];
-  if (opt.enableCache && opt.enableBlobCache) {
+  if (opt.enablePure) {
+    urls.push(makeDomain(location) + "/" + "thirdparty/pure/pure-min.css");
+  }
+  if (opt.enableBlobCache) {
     return createProxyURLs(urls, "text/javascript", function(_urls) {
       return callback(_urls);
     });
@@ -420,19 +429,15 @@ buildErr = function(jsResult, htmlResult, cssResult) {
 includeFirebugLite = function(head, jsResult, htmlResult, cssResult, opt, callback) {
   var caching;
   caching = function(next) {
-    if (opt.enableCache && opt.enableBlobCache) {
+    if (opt.enableBlobCache) {
       return URLToText(makeDomain(location) + "/" + "thirdparty/firebug/firebug-lite.js", function(text) {
         var _text;
         _text = text.replace("var m=path&&path.match(/([^\\/]+)\\/$/)||null;", "var m=['build/', 'build']; path='" + (makeDomain(location)) + "/thirdparty/firebug/build/'");
         return next(createBlobURL(_text, "text/javascript"));
       });
-    } else if (opt.enableCache) {
-      return setTimeout(function() {
-        return next(makeDomain(location) + "/" + "thirdparty/firebug/firebug-lite.js");
-      });
     } else {
       return setTimeout(function() {
-        return next("https://getfirebug.com/firebug-lite.js");
+        return next(makeDomain(location) + "/" + "thirdparty/firebug/firebug-lite.js");
       });
     }
   };
