@@ -128,6 +128,11 @@ Main = (function() {
     }, opt, function(srcdoc) {
       var url;
       switch (opt.iframeType) {
+        case "blob":
+          console.log(url = createBlobURL(srcdoc, "text/html"));
+          return $("#box-sandbox-iframe").attr({
+            "src": url
+          });
         case "srcdoc":
           return $("#box-sandbox-iframe").attr({
             "srcdoc": srcdoc
@@ -138,13 +143,15 @@ Main = (function() {
               "src": base64
             });
           });
-        case "blob":
-          console.log(url = createBlobURL(srcdoc, "text/html"));
+        case "message":
           return $("#box-sandbox-iframe").attr({
-            "src": url
+            "src": "iframe.html"
+          }).on("load", function(ev) {
+            console.log(srcdoc);
+            return this.contentWindow.postMessage(srcdoc, "*");
           });
         default:
-          throw new Error(_opt.iframeType);
+          throw new Error(opt.iframeType);
       }
     });
   };

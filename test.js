@@ -1,4 +1,4 @@
-QUnit.config.testTimeout = 3000;
+QUnit.config.testTimeout = 3500;
 
 QUnit.module("URL");
 
@@ -386,7 +386,7 @@ encodeDataURI("try{\n  window.testResult = window.testResult || {};\n  window.te
   createSrcdoc = function(context) {
     var objectURI, srcdoc;
     objectURI = createBlobURL("try{\n  window.testResult = window.testResult || {};\n  window.testResult.objectURL = location.href;\n  document.write(\"<p>objectURL</p>\");\n}catch(err){\n  document.write(JSON.stringify(err))\n}", "text/javascript");
-    return srcdoc = "<h2>" + context + "</h2>\n<script type=\"text/javascript\" src=\"https://getfirebug.com/firebug-lite.js\">\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n</script>\n<script src=\"" + dataURI + "\"></script>\n<script src=\"" + objectURI + "\"></script>\n<script>\n  try{\n    window.testResult = window.testResult || {};\n    window.testResult.inline = location.href;\n    window.testResult.context = \"" + context + "\";\n    document.write(\"<p>inline</p>\");\n    document.write(\"<p><a target='_blank' href='\"+location.href+\"'>\"+location.href+\"</a></p>\");\n    target = (parent.postMessage ? parent : (parent.document.postMessage ? parent.document : undefined));\n    target.postMessage(JSON.stringify(window.testResult), \"" + (makeURL(location)) + "\");\n  }catch(err){\n    document.write(JSON.stringify(err))\n  }\n</script>";
+    return srcdoc = "<h2>" + context + "</h2>\n<script type=\"text/javascript\" src=\"https://getfirebug.com/firebug-lite.js\">\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n</script>\n<script src=\"" + dataURI + "\"></script>\n<script src=\"" + objectURI + "\"></script>\n<script>\n  try{\n    window.testResult = window.testResult || {};\n    window.testResult.inline = location.href;\n    window.testResult.context = \"" + context + "\";\n    document.write(\"<p>inline</p>\");\n    document.write(\"<p><a target='_blank' href='\"+location.href+\"'>\"+location.href+\"</a></p>\");\n    target = (parent.postMessage ? parent : (parent.document.postMessage ? parent.document : undefined));\n    target.postMessage(JSON.stringify(window.testResult), \"*\");\n  }catch(err){\n    document.write(JSON.stringify(err))\n  }\n</script>";
   };
   style = {
     height: "400px",
@@ -402,6 +402,7 @@ encodeDataURI("try{\n  window.testResult = window.testResult || {};\n  window.te
     return window.onmessage = function(ev) {
       var testResult;
       testResult = JSON.parse(ev.data);
+      console.dir(ev);
       assert.ok(testResult.dataURI, ev.data);
       assert.ok(testResult.objectURL, ev.data);
       assert.ok(testResult.inline, ev.data);
@@ -424,7 +425,7 @@ encodeDataURI("try{\n  window.testResult = window.testResult || {};\n  window.te
       return QUnit.start();
     };
   });
-  return QUnit.asyncTest("check dataURI iframe behavior", function(assert) {
+  QUnit.asyncTest("check dataURI iframe behavior", function(assert) {
     return encodeDataURI(createSrcdoc("dataURI"), "text/html", function(base64) {
       var iframe;
       iframe = $("<iframe />").css(style).attr({
@@ -441,5 +442,24 @@ encodeDataURI("try{\n  window.testResult = window.testResult || {};\n  window.te
         return QUnit.start();
       };
     });
+  });
+  return QUnit.asyncTest("check message iframe behavior", function(assert) {
+    var iframe;
+    iframe = $("<iframe />").css(style).attr({
+      "src": "iframe.html"
+    });
+    $("<div>").append(iframe).appendTo("body");
+    iframe[0].onload = function() {
+      return iframe[0].contentWindow.postMessage(createSrcdoc("message"), "*");
+    };
+    expect(3);
+    return window.onmessage = function(ev) {
+      var testResult;
+      console.dir(testResult = JSON.parse(ev.data));
+      assert.ok(testResult.dataURI, ev.data);
+      assert.ok(testResult.objectURL, ev.data);
+      assert.ok(testResult.inline, ev.data);
+      return QUnit.start();
+    };
   });
 });
