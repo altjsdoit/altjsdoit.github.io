@@ -1,6 +1,6 @@
 CACHE MANIFEST
 # version: 0.9.0
-# build: Mon Jun 30 2014 07:21:49 GMT+0900 (JST)
+# build: Mon Jun 30 2014 07:22:40 GMT+0900 (JST)
 
 CACHE:
 icon-128.png
@@ -32,7 +32,6 @@ thirdparty/jquery/jquery.min.js
 thirdparty/es6-shim/es6-shim.min.js
 thirdparty/processing.js/processing.min.js
 thirdparty/mathjs/math.min.js
-thirdparty/mathjax/MathJax.js
 
 
 NETWORK:
