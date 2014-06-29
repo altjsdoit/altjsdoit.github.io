@@ -65,7 +65,7 @@ QUnit.asyncTest("URLToArrayBuffer", function(assert) {
 QUnit.asyncTest("createProxyURLs", function(assert) {
   var n, urls;
   n = 0;
-  urls = ["index.html", "test.html", "ui.js", "cache.js"];
+  urls = ["index.html", "test.html"];
   expect(urls.length);
   return createProxyURLs(urls, "text/html", function(_urls) {
     return _urls.forEach(function(_url, i) {
@@ -254,26 +254,20 @@ QUnit.asyncTest("getIncludeStyleURLs", function(assert) {
 });
 
 QUnit.asyncTest("getIncludeScriptURLs", function(assert) {
-  expect(3);
+  expect(2);
   return getIncludeScriptURLs({
-    enableZepto: true
+    enableJQuery: true
   }, function(urls) {
-    assert.deepEqual(urls, ["https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"], JSON.stringify(urls));
+    assert.deepEqual(urls, [makeDomain(location) + "/" + "thirdparty/jquery/jquery.min.js"], JSON.stringify(urls));
     return getIncludeScriptURLs({
-      enableJQuery: true,
-      enableCache: true
+      enableUnderscore: true,
+      enableCache: true,
+      enableBlobCache: true
     }, function(urls) {
-      assert.deepEqual(urls, [makeDomain(location) + "/" + "thirdparty/jquery/jquery.min.js"], JSON.stringify(urls));
-      return getIncludeScriptURLs({
-        enableUnderscore: true,
-        enableCache: true,
-        enableBlobCache: true
-      }, function(urls) {
-        return URLToText(urls[0], function(_text) {
-          return URLToText(makeDomain(location) + "/" + "thirdparty/underscore.js/underscore-min.js", function(text) {
-            assert.strictEqual(_text, text, _text);
-            return QUnit.start();
-          });
+      return URLToText(urls[0], function(_text) {
+        return URLToText(makeDomain(location) + "/" + "thirdparty/underscore.js/underscore-min.js", function(text) {
+          assert.strictEqual(_text, text, _text);
+          return QUnit.start();
         });
       });
     });
