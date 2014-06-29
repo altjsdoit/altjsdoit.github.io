@@ -1,4 +1,4 @@
-var URLToArrayBuffer, URLToText, build, buildErr, buildHTML, buildScripts, buildStyles, compileAll, createBlobURL, createProxyURLs, decodeDataURI, decodeURIQuery, dir, encodeDataURI, encodeURIQuery, expandURL, getCompilerSetting, getElmVal, getIncludeScriptURLs, getIncludeStyleURLs, includeFirebugLite, log, makeDomain, makeURL, shortenURL, unzipDataURI, zipDataURI;
+var URLToArrayBuffer, URLToText, build, buildErr, buildHTML, buildScripts, buildStyles, compileAll, createBlobURL, createProxyURLs, decodeDataURI, decodeURIQuery, dir, encodeDataURI, encodeURIQuery, expandURL, getCompilerSetting, getElmVal, getIncludeScriptURLs, getIncludeStyleURLs, includeFirebugLite, loadDOM, loadURI, log, makeDomain, makeURL, shortenURL, unzipDataURI, zipDataURI;
 
 window.URL = window.URL || window.webkitURL || window.mozURL;
 
@@ -54,6 +54,11 @@ createProxyURLs = function(urls, mimetype, callback) {
   var n, _urls;
   n = 0;
   _urls = [];
+  if (urls.length === 0) {
+    setTimeout(function() {
+      return callback(_urls);
+    });
+  }
   return urls.forEach(function(url, i) {
     n++;
     return URLToArrayBuffer(url, function(arrayBuffer) {
@@ -194,6 +199,32 @@ unzipDataURI = function(base64) {
   return hash;
 };
 
+loadURI = function(location) {
+  var config, markup, script, style, zip, _ref;
+  zip = decodeURIQuery(location.hash.slice(1)).zip;
+  if (zip != null) {
+    _ref = unzipDataURI(zip), config = _ref.config, script = _ref.script, markup = _ref.markup, style = _ref.style;
+    if (config != null) {
+      config = JSON.parse(config);
+    }
+  }
+  return {
+    config: config || {},
+    script: script || null,
+    markup: markup || null,
+    style: style || null
+  };
+};
+
+loadDOM = function(elm) {
+  var config;
+  config = {};
+  $(elm).find("input[data-config]").forEach(function(item) {
+    return config[$(item).attr("data-config")] = getElmVal(item);
+  });
+  return config;
+};
+
 getElmVal = function(elm) {
   if (elm instanceof HTMLInputElement && $(elm).attr("type") === "checkbox") {
     return $(elm).is(':checked');
@@ -279,6 +310,11 @@ getCompilerSetting = function(lang) {
 compileAll = function(langs, callback) {
   var n, next, results;
   n = 0;
+  if (langs.length === 0) {
+    setTimeout(function() {
+      return callback([]);
+    });
+  }
   results = [];
   next = function(result, i) {
     results[i] = result;

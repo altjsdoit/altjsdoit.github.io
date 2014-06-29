@@ -154,6 +154,14 @@ QUnit.test("zipDataURI, unzipDataURI", function(assert) {
 
 QUnit.module("DOM");
 
+QUnit.test("loadURI", function(assert) {
+  return expect(0);
+});
+
+QUnit.test("loadDOM", function(assert) {
+  return expect(0);
+});
+
 QUnit.test("getElmVal", function(assert) {
   var elm;
   expect(3);
