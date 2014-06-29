@@ -1,6 +1,6 @@
 CACHE MANIFEST
 # version: 0.9.0
-# build: Mon Jun 30 2014 07:25:45 GMT+0900 (JST)
+# build: Mon Jun 30 2014 07:34:11 GMT+0900 (JST)
 
 CACHE:
 icon-128.png
@@ -31,6 +31,7 @@ thirdparty/firebug/firebug-lite.js
 thirdparty/jquery/jquery.min.js
 thirdparty/es6-shim/es6-shim.min.js
 thirdparty/processing.js/processing.min.js
+thirdparty/Chart.js/Chart.min.js
 thirdparty/mathjs/math.min.js
 
 
