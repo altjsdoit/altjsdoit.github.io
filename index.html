@@ -18,7 +18,10 @@
       <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
         <ul id="menu-page-tab">
           <li data-target="#box-config" class="selected">altjsdoit</li>
-          <li data-target="#box-editor">Editor</li>
+          <li data-target="#box-editor" data-tab="script">Script</li>
+          <li data-target="#box-editor" data-tab="markup">Markup</li>
+          <li data-target="#box-editor" data-tab="style">Style</li>
+          <li data-target="#box-editor" data-tab="compile">Compile</li>
           <li data-target="#box-sandbox">Run</li>
         </ul>
       </div>
@@ -37,11 +40,6 @@
               <label>Save as URL:
                 <input id="config-project-url" type="url" value="" placeholder="Press Save Button" onclick="this.select();">
                 <input id="config-project-save" type="button" value="Save" class="pure-button pure-button-primary">&nbsp;<a target="_blank" href="/" class="pure-button">New Project</a>&nbsp;<span id="config-project-twitter"></span>
-              </label>
-            </p>
-            <p>
-              <label>CodeMirror:
-                <input id="config-editor-codemirror" type="checkbox" checked="checked">
               </label>
             </p>
           </fieldset>
@@ -108,6 +106,9 @@
           </fieldset>
           <fieldset>
             <legend>Debug</legend>
+            <label>use CodeMirror:
+              <input id="config-editor-codemirror" type="checkbox" checked="checked">
+            </label>
             <label>use blobCache:
               <input data-config="enableBlobCache" type="checkbox">
             </label>
@@ -123,23 +124,13 @@
           </fieldset>
           <fieldset>
             <legend>About</legend>
-            <p>altjsdoit 0.9.3<br>Mon Jun 30 2014 11:53:14 GMT+0900 (JST)</p>
+            <p>altjsdoit 0.9.3<br>Mon Jun 30 2014 18:54:42 GMT+0900 (JST)</p>
             <p><a target="_blank" href="https://github.com/altjsdoit/altjsdoit" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
           </fieldset>
         </form>
       </section>
       <section id="box-editor">
-        <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
-          <ul id="box-editor-tab">
-            <li data-tab="script" class="selected">Script</li>
-            <li data-tab="markup">Markup</li>
-            <li data-tab="style">Style</li>
-            <li data-tab="compiled">Compiled</li>
-          </ul>
-        </div>
-        <div id="box-editor-content">
-          <textarea id="box-editor-textarea" wrap="off"></textarea>
-        </div>
+        <textarea id="box-editor-textarea" wrap="off"></textarea>
       </section>
       <section id="box-sandbox">
         <iframe id="box-sandbox-iframe"></iframe>

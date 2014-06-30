@@ -38,14 +38,8 @@ Main = (function() {
     })(this));
     $("#config-project-save").click((function(_this) {
       return function(ev) {
-        ev.preventDefault();
         _this.saveURI();
         return _this.shareURI();
-      };
-    })(this));
-    $("#menu-page-tab li[data-target='#box-sandbox']").click((function(_this) {
-      return function(ev) {
-        return _this.run();
       };
     })(this));
     $("#menu-page-tab li").click((function(_this) {
@@ -57,12 +51,22 @@ Main = (function() {
         $("#main").find(".active").removeClass("active");
         target = $(ev.target).attr("data-target");
         $(target).addClass("active");
-        if (target !== "#box-sandbox") {
+        if (target === "#box-sandbox") {
+          _this.run();
+        } else {
           _this.stop();
+        }
+        if (target === "#box-editor") {
+          _this.editor.selectTab(ev);
         }
         return _this.editor.render();
       };
     })(this));
+    $(window).resize(function() {
+      $("#main").css("top", $("#menu-page-tab").height());
+      return $("#main").height($(window).height() - $("#menu-page-tab").height());
+    });
+    $(window).resize();
     this.model.bind("change", (function(_this) {
       return function() {
         var opt;
@@ -209,41 +213,15 @@ Config = Backbone.View.extend({
 
 Editor = Backbone.View.extend({
   el: "#box-editor",
-  events: {
-    "click #box-editor-tab li": "selectTab",
-    "click #box-editor-tab li[data-tab='compiled']": "compile"
-  },
-  compile: function(ev) {
-    var altcss, althtml, altjs, markup, opt, script, style, _ref, _ref1;
-    _ref = opt = this.model.toJSON(), altjs = _ref.altjs, althtml = _ref.althtml, altcss = _ref.altcss;
-    _ref1 = this.getValues(), script = _ref1.script, markup = _ref1.markup, style = _ref1.style;
-    return build({
-      altjs: altjs,
-      althtml: althtml,
-      altcss: altcss
-    }, {
-      script: script,
-      markup: markup,
-      style: style
-    }, opt, (function(_this) {
-      return function(srcdoc) {
-        _this.doc.compiled.setValue(srcdoc);
-        if (_this.selected === "compiled") {
-          $("#box-editor-textarea").val(srcdoc);
-        }
-        return _this.render();
-      };
-    })(this));
-  },
   selectTab: function(ev) {
     var selected;
-    ev.preventDefault();
-    $(this.el).find(".selected").removeClass("selected");
-    $(ev.target).addClass("selected");
     selected = $(ev.target).attr("data-tab");
     if (!this.enableCodeMirror) {
       this.doc[this.selected].setValue($("#box-editor-textarea").val());
       $("#box-editor-textarea").val(this.doc[selected].getValue());
+    }
+    if (selected === "compile") {
+      this.compile();
     }
     this.selected = selected;
     return this.render();
@@ -298,42 +276,42 @@ Editor = Backbone.View.extend({
         })(this),
         "Cmd-1": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(1)").click();
+            return $("#menu-page-tab").children("[data-tab='script']").click();
           };
         })(this),
         "Ctrl-1": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(1)").click();
+            return $("#menu-page-tab").children("[data-tab='script']").click();
           };
         })(this),
         "Cmd-2": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(2)").click();
+            return $("#menu-page-tab").children("[data-tab='markup']").click();
           };
         })(this),
         "Ctrl-2": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(2)").click();
+            return $("#menu-page-tab").children("[data-tab='markup']").click();
           };
         })(this),
         "Cmd-3": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(3)").click();
+            return $("#menu-page-tab").children("[data-tab='style']").click();
           };
         })(this),
         "Ctrl-3": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(3)").click();
+            return $("#menu-page-tab").children("[data-tab='style']").click();
           };
         })(this),
         "Cmd-4": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(4)").click();
+            return $("#menu-page-tab").children("[data-tab='compile']").click();
           };
         })(this),
         "Ctrl-4": (function(_this) {
           return function(cm) {
-            return $("#box-editor-tab").children("*:nth-child(4)").click();
+            return $("#menu-page-tab").children("[data-tab='compile']").click();
           };
         })(this)
       }
@@ -344,13 +322,13 @@ Editor = Backbone.View.extend({
       script: "JavaScript",
       markup: "HTML",
       style: "CSS",
-      compiled: "HTML"
+      compile: "HTML"
     };
     this.doc = {
       script: new CodeMirror.Doc(""),
       markup: new CodeMirror.Doc(""),
       style: new CodeMirror.Doc(""),
-      compiled: new CodeMirror.Doc("")
+      compile: new CodeMirror.Doc("")
     };
     this.cm = CodeMirror.fromTextArea($("#box-editor-textarea")[0], this.option);
     this.originDoc = this.cm.swapDoc(this.doc.script);
@@ -376,20 +354,42 @@ Editor = Backbone.View.extend({
       style: this.doc.style.getValue()
     };
   },
+  compile: function() {
+    var altcss, althtml, altjs, markup, opt, script, style, _ref, _ref1;
+    _ref = opt = this.model.toJSON(), altjs = _ref.altjs, althtml = _ref.althtml, altcss = _ref.altcss;
+    _ref1 = this.getValues(), script = _ref1.script, markup = _ref1.markup, style = _ref1.style;
+    return build({
+      altjs: altjs,
+      althtml: althtml,
+      altcss: altcss
+    }, {
+      script: script,
+      markup: markup,
+      style: style
+    }, opt, (function(_this) {
+      return function(srcdoc) {
+        _this.doc.compile.setValue(srcdoc);
+        if (_this.selected === "compile") {
+          $("#box-editor-textarea").val(srcdoc);
+        }
+        return _this.render();
+      };
+    })(this));
+  },
   render: function() {
     var opt, tmp, _ref;
     opt = this.model.toJSON();
-    tmp = $("#box-editor-tab");
-    tmp.find("[data-tab='script']").html(this.mode.script = opt.altjs);
-    tmp.find("[data-tab='markup']").html(this.mode.markup = opt.althtml);
-    tmp.find("[data-tab='style']").html(this.mode.style = opt.altcss);
+    tmp = $("#menu-page-tab");
+    tmp.find("[data-target='#box-editor'][data-tab='script']").html(this.mode.script = opt.altjs);
+    tmp.find("[data-target='#box-editor'][data-tab='markup']").html(this.mode.markup = opt.althtml);
+    tmp.find("[data-target='#box-editor'][data-tab='style']").html(this.mode.style = opt.altcss);
     if (this.enableCodeMirror) {
       this.cm.setSize("100%", "100%");
       if ((_ref = this.cm) != null) {
         _ref.swapDoc(this.doc[this.selected]);
       }
       this.cm.setOption("mode", getCompilerSetting(this.mode[this.selected]).mode);
-      if (this.selected === "compiled") {
+      if (this.selected === "compile") {
         this.cm.setOption("readOnly", true);
       } else {
         this.cm.setOption("readOnly", false);
