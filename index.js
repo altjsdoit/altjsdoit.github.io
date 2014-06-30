@@ -350,9 +350,8 @@ Editor = Backbone.View.extend({
       return function(srcdoc) {
         _this.doc.compile.setValue(srcdoc);
         if (_this.selected === "compile") {
-          $("#box-editor-textarea").val(srcdoc);
+          return $("#box-editor-textarea").val(srcdoc);
         }
-        return _this.render();
       };
     })(this));
   },
