@@ -341,10 +341,10 @@ Editor = Backbone.View.extend({
     this.enableCodeMirror = true;
     this.selected = "script";
     this.mode = {
-      script: "javascript",
-      markup: "xml",
-      style: "css",
-      compiled: "xml"
+      script: "JavaScript",
+      markup: "HTML",
+      style: "CSS",
+      compiled: "HTML"
     };
     this.doc = {
       script: new CodeMirror.Doc(""),
@@ -380,15 +380,15 @@ Editor = Backbone.View.extend({
     var opt, tmp, _ref;
     opt = this.model.toJSON();
     tmp = $("#box-editor-tab");
-    tmp.find("[data-tab='script']").html(opt.altjs);
-    tmp.find("[data-tab='markup']").html(opt.althtml);
-    tmp.find("[data-tab='style']").html(opt.altcss);
+    tmp.find("[data-tab='script']").html(this.mode.script = opt.altjs);
+    tmp.find("[data-tab='markup']").html(this.mode.markup = opt.althtml);
+    tmp.find("[data-tab='style']").html(this.mode.style = opt.altcss);
     if (this.enableCodeMirror) {
       this.cm.setSize("100%", "100%");
       if ((_ref = this.cm) != null) {
         _ref.swapDoc(this.doc[this.selected]);
       }
-      this.cm.setOption("mode", this.mode[this.selected]);
+      this.cm.setOption("mode", getCompilerSetting(this.mode[this.selected]).mode);
       if (this.selected === "compiled") {
         this.cm.setOption("readOnly", true);
       } else {
