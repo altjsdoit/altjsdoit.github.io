@@ -1,16 +1,17 @@
 var Config, Editor, Main, Model;
 
-$(function() {
-  window.main = new Main;
-  return window.applicationCache.addEventListener('updateready', function(ev) {
-    if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-      window.applicationCache.swapCache();
-      if (confirm('A new version of this site is available. Save and load it?')) {
-        window.main.saveURI();
-        return location.reload();
-      }
+window.applicationCache.addEventListener('updateready', function(ev) {
+  if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
+    window.applicationCache.swapCache();
+    if (confirm('A new version of this site is available. Save and load it?')) {
+      window.main.saveURI();
+      return location.reload();
     }
-  });
+  }
+});
+
+$(function() {
+  return window.main = new Main;
 });
 
 Main = (function() {
@@ -31,11 +32,6 @@ Main = (function() {
       markup: uriData.markup || "<p class='helloworld'>hello world</p>",
       style: uriData.style || ".helloworld { color: gray; }"
     });
-    $("#config-editor-codemirror").change((function(_this) {
-      return function(ev) {
-        return _this.editor.toggle(ev);
-      };
-    })(this));
     $("#config-project-save").click((function(_this) {
       return function(ev) {
         _this.saveURI();
@@ -44,36 +40,27 @@ Main = (function() {
     })(this));
     $("#menu-page-tab li").click((function(_this) {
       return function(ev) {
-        var target;
+        var tab, target;
         ev.preventDefault();
-        $("#menu").find(".selected").removeClass("selected");
-        $(ev.target).addClass("selected");
-        $("#main").find(".active").removeClass("active");
         target = $(ev.target).attr("data-target");
-        $(target).addClass("active");
-        if (target === "#box-sandbox") {
-          _this.run();
-        } else {
-          _this.stop();
+        tab = $(ev.target).attr("data-tab");
+        _this.model.set("tabPage", target);
+        if (tab != null) {
+          _this.model.set("tabEditor", tab);
         }
-        if (target === "#box-editor") {
-          _this.editor.selectTab(ev);
-        }
-        return _this.editor.render();
+        return _this.saveURI();
       };
     })(this));
     $(window).resize(function() {
-      $("#main").css("top", $("#menu-page-tab").height());
-      return $("#main").height($(window).height() - $("#menu-page-tab").height());
+      return $("#main").css("top", $("#menu-page-tab").height()).height($(window).height() - $("#menu-page-tab").height());
     });
     $(window).resize();
     this.model.bind("change", (function(_this) {
       return function() {
-        var opt;
-        opt = _this.model.toJSON();
-        return $("title").html(opt.title + (" - " + (new Date(opt.timestamp)) + " - altjsdo.it"));
+        return _this.render();
       };
     })(this));
+    this.render();
   }
 
   Main.prototype.dump = function() {
@@ -155,7 +142,7 @@ Main = (function() {
             return this.contentWindow.postMessage(srcdoc, "*");
           });
         default:
-          throw new Error(opt.iframeType);
+          throw new Error("unknown iframe type: " + opt.iframeType);
       }
     });
   };
@@ -165,6 +152,21 @@ Main = (function() {
       "src": null,
       "srcdoc": null
     });
+  };
+
+  Main.prototype.render = function() {
+    var opt;
+    opt = this.model.toJSON();
+    $("title").html(opt.title + (" - " + (new Date(opt.timestamp)) + " - altjsdo.it"));
+    $("#menu").find(".selected").removeClass("selected");
+    $("#main").find(".active").removeClass("active");
+    $("#menu").find("[data-target='" + opt.tabPage + "'][data-tab='" + opt.tabEditor + "']").addClass("selected");
+    $(opt.tabPage).addClass("active");
+    if (opt.tabPage === "#box-sandbox") {
+      return this.run();
+    } else {
+      return this.stop();
+    }
   };
 
   return Main;
@@ -178,7 +180,9 @@ Model = Backbone.Model.extend({
     altjs: "JavaScript",
     althtml: "HTML",
     altcss: "CSS",
-    iframeType: "blob"
+    iframeType: "blob",
+    tabPage: "#box-config",
+    tabEditor: "script"
   }
 });
 
@@ -213,30 +217,6 @@ Config = Backbone.View.extend({
 
 Editor = Backbone.View.extend({
   el: "#box-editor",
-  selectTab: function(ev) {
-    var selected;
-    selected = $(ev.target).attr("data-tab");
-    if (!this.enableCodeMirror) {
-      this.doc[this.selected].setValue($("#box-editor-textarea").val());
-      $("#box-editor-textarea").val(this.doc[selected].getValue());
-    }
-    if (selected === "compile") {
-      this.compile();
-    }
-    this.selected = selected;
-    return this.render();
-  },
-  toggle: function(ev) {
-    if (this.enableCodeMirror = getElmVal(ev.target)) {
-      this.cm = CodeMirror.fromTextArea($("#box-editor-textarea")[0], this.option);
-      this.originDoc = this.cm.swapDoc(this.doc[this.selected]);
-    } else {
-      this.cm.toTextArea();
-      this.cm.swapDoc(this.originDoc);
-      this.cm = null;
-    }
-    return this.render();
-  },
   initialize: function() {
     _.bindAll(this, "render");
     this.model.bind("change", this.render);
@@ -377,17 +357,35 @@ Editor = Backbone.View.extend({
     })(this));
   },
   render: function() {
-    var opt, tmp, _ref;
+    var opt, tmp;
     opt = this.model.toJSON();
     tmp = $("#menu-page-tab");
     tmp.find("[data-target='#box-editor'][data-tab='script']").html(this.mode.script = opt.altjs);
     tmp.find("[data-target='#box-editor'][data-tab='markup']").html(this.mode.markup = opt.althtml);
     tmp.find("[data-target='#box-editor'][data-tab='style']").html(this.mode.style = opt.altcss);
+    if ((opt.tabEditor != null) && this.selected !== opt.tabEditor) {
+      if (!this.enableCodeMirror) {
+        this.doc[this.selected].setValue($("#box-editor-textarea").val());
+        $("#box-editor-textarea").val(this.doc[opt.tabEditor].getValue());
+      }
+      this.selected = opt.tabEditor;
+    }
+    if (this.selected === "compile") {
+      this.compile();
+    }
+    if ((opt.enableCodeMirror != null) && this.enableCodeMirror !== opt.enableCodeMirror) {
+      if (this.enableCodeMirror = opt.enableCodeMirror) {
+        this.cm = CodeMirror.fromTextArea($("#box-editor-textarea")[0], this.option);
+        this.originDoc = this.cm.swapDoc(this.doc[this.selected]);
+      } else {
+        this.cm.toTextArea();
+        this.cm.swapDoc(this.originDoc);
+        this.cm = null;
+      }
+    }
     if (this.enableCodeMirror) {
       this.cm.setSize("100%", "100%");
-      if ((_ref = this.cm) != null) {
-        _ref.swapDoc(this.doc[this.selected]);
-      }
+      this.cm.swapDoc(this.doc[this.selected]);
       this.cm.setOption("mode", getCompilerSetting(this.mode[this.selected]).mode);
       if (this.selected === "compile") {
         this.cm.setOption("readOnly", true);
@@ -397,8 +395,8 @@ Editor = Backbone.View.extend({
     }
     return setTimeout((function(_this) {
       return function() {
-        var _ref1;
-        return (_ref1 = _this.cm) != null ? _ref1.refresh() : void 0;
+        var _ref;
+        return (_ref = _this.cm) != null ? _ref.refresh() : void 0;
       };
     })(this));
   }
