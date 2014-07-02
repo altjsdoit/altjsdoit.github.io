@@ -18,7 +18,7 @@ Main = (function() {
   function Main() {
     var config, uriData;
     config = loadDOM($("#box-config")[0]);
-    uriData = loadURI(location);
+    uriData = dir(loadURI(location));
     this.model = new Model();
     this.model.set(_.extend(config, uriData.config));
     this.config = new Config({
@@ -312,11 +312,16 @@ Editor = Backbone.View.extend({
     };
     this.cm = CodeMirror.fromTextArea($("#box-editor-textarea")[0], this.option);
     this.originDoc = this.cm.swapDoc(this.doc.script);
+    this.initialized = false;
     return this.render();
   },
   setValues: function(_arg) {
     var markup, script, style;
     script = _arg.script, markup = _arg.markup, style = _arg.style;
+    if (!this.initialized) {
+      $("#box-editor-textarea").val(script);
+    }
+    this.initialized = true;
     if (script != null) {
       this.doc.script.setValue(script);
     }
