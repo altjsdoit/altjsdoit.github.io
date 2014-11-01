@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.32 epsilon</title>
-<link rel='source' href='http://goo.gl/uxz4Yy' />
+<title>AltJSDoIt 0.10.33 epsilon</title>
+<link rel='source' href='http://goo.gl/bmkm3k' />
 
 
 <style>
@@ -634,7 +634,7 @@ Editor = (function() {
     "GorillaScript": "text/x-livescript",
     "LispyScript": "text/x-common-lisp",
     "Wisp": "text/x-clojure",
-    "BiwaScheme ": "text/x-scheme",
+    "BiwaScheme ": "scheme",
     "HTML": "text/html",
     "Jade": "text/x-jade",
     "CSS": "text/css",
@@ -1587,7 +1587,7 @@ ACC = (function() {
           var code, err, error, html, session, _ref;
           _ref = _arg.data, session = _ref.session, code = _ref.code;
           try {
-            html = "<script src='https://altjsdoit.github.io/thirdparty/biwascheme-0.6.2-min.js'><" + "/script>\n";
+            html = "<script src='https://altjsdoit.github.io/thirdparty/biwascheme/biwascheme-0.6.2-min.js'><" + "/script>\n";
             html += "<script id='biwa-scheme' type='text/scheme'>\n";
             html += code + "\n";
             html += "<" + "/script>\n";
