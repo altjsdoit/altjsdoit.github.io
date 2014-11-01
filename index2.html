@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <title>AltJSDoIt 0.10.22 delta</title>
-<link rel='author' href='http://goo.gl/w47KvS'>
-
+<link rel='author' href='http://goo.gl/T9G3Rh'>
+<script src='https://altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js'></script>
+<script src='https://altjsdoit.github.io/thirdparty/mathjs/math.min.js'></script>
+<script src='https://altjsdoit.github.io/thirdparty/processing.js/processing.min.js'></script>
+<script src='https://altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js'></script><link rel='stylesheet' href='https://altjsdoit.github.io/thirdparty/pure/pure-min.css' />
 <style>
 header#menu nav input[type="radio"] {
   display: none;
@@ -941,9 +944,9 @@ Compiler = (function() {
             } else {
               return new WMURLShortener().shorten(savedurl, function(err, shortUrl) {
                 if (!!err) {
-                  return resolve(("<link rel='source' href='" + savedurl + "' />\n") + scripts + styles);
+                  return resolve(("<link rel='source' href='" + savedurl + "' />\n") + scripts(+"\n" + styles));
                 } else {
-                  return resolve(("<link rel='source' href='" + shortUrl + "' />\n") + scripts + styles);
+                  return resolve(("<link rel='source' href='" + shortUrl + "' />\n") + scripts(+"\n" + styles));
                 }
               });
             }
@@ -985,16 +988,16 @@ Compiler = (function() {
     var report;
     report = "";
     if (!!jsErr) {
-      report += this.lang.altjs + ":\n" + jsErr.stack;
+      report += this.lang.altjs + ":\n" + (jsErr.stack || jsErr.message || "compile error");
     }
     if (!!htmlErr) {
-      report += this.lang.althtml + ":\n" + htmlErr.stack;
+      report += this.lang.althtml + ":\n" + (htmlErr.stack || htmlErr.message || "compile error");
     }
     if (!!cssErr) {
-      report += this.lang.altcss + ":\n" + cssErr.stack;
+      report += this.lang.altcss + ":\n" + (cssErr.stack || cssErr.message || "compile error");
     }
     if (!!bugErr) {
-      report += "internal error" + ":\n" + bugErr.stack;
+      report += "internal error" + ":\n" + (bugErr.stack || bugErr.message || "internal error");
     }
     console.error(report);
     return "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\" />\n<style>\npre{font-family: 'Source Code Pro','Menlo','Monaco','Andale Mono','lucida console','Courier New','monospace';}\n</style>\n</head>\n<body>\n<pre>\n" + report + "</pre>\n</body>\n</html>";
@@ -1425,11 +1428,12 @@ ACC = (function() {
       }
     },
     "Roy": {
+      "useIframe": true,
       "compiler": function() {
-        self.importScripts("https://altjsdoit.github.io/thirdparty/roy/roy-min.js");
-        return self.addEventListener("message", function(_arg) {
-          var code, err, error, html, js, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+        document.write("<script src='https://altjsdoit.github.io/thirdparty/roy/roy-min.js'><" + "/script>\n");
+        return window.addEventListener("message", function(_arg) {
+          var code, err, error, html, js, origin, session, source, srcElement, _ref;
+          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             js = roy.compile(code, {}, {}, {
               modules: {
@@ -1444,11 +1448,11 @@ ACC = (function() {
               stack: err.stack
             };
           }
-          return self.postMessage({
+          return (source || srcElement).postMessage({
             session: session,
             html: html,
             error: error
-          });
+          }, origin);
         });
       }
     },
