@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>AltJSDoIt 0.10.22 delta</title>
-<link rel='author' href='http://goo.gl/NEFHHh'>
+<link rel='author' href='http://goo.gl/Lu8fp4'>
 
 <style>
 header#menu nav input[type="radio"] {
@@ -172,6 +172,7 @@ code {
               <option value="LiveScript">LiveScript</option>
               <option value="PureScript">PureScript</option>
               <option value="GorillaScript">GorillaScript</option>
+              <option value="Roy">Roy</option>
               <option value="BiwaScheme">BiwaScheme</option>
               <option value="Wisp">Wisp</option>
               <option value="LispyScript">LispyScript</option>
@@ -1408,6 +1409,34 @@ ACC = (function() {
             }
             html = "<script src='https://altjsdoit.github.io/thirdparty/livescript/prelude-browser-min.js'><" + "/script>\n";
             html += "<script>\n" + js + "<" + "/script>\n";
+          } catch (_error) {
+            err = _error;
+            error = {
+              message: err.message,
+              stack: err.stack
+            };
+          }
+          return self.postMessage({
+            session: session,
+            html: html,
+            error: error
+          });
+        });
+      }
+    },
+    "Roy": {
+      "compiler": function() {
+        self.importScripts("https://altjsdoit.github.io/thirdparty/roy/roy.min.js");
+        return self.addEventListener("message", function(_arg) {
+          var code, err, error, html, js, session, _ref;
+          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          try {
+            js = roy.compile(code, {}, {}, {
+              modules: {
+                dom: "document: {documentURI: String, getElementById: Function(String,{getAttribute: Function(String,String), innerHTML: String, innerText: String, tagName: String})}\n"
+              }
+            }).output;
+            html = "<script>\n" + js + "<" + "/script>\n";
           } catch (_error) {
             err = _error;
             error = {
