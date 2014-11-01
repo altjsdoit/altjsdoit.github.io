@@ -2,12 +2,13 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.22 delta</title>
-<link rel='author' href='http://goo.gl/Heqht0'>
+<title>AltJSDoIt 0.10.25 epsilon</title>
+<link rel='source' href='http://goo.gl/t8GW6z' />
 <script src='https://altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js'></script>
 <script src='https://altjsdoit.github.io/thirdparty/mathjs/math.min.js'></script>
 <script src='https://altjsdoit.github.io/thirdparty/processing.js/processing.min.js'></script>
-<script src='https://altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js'></script><link rel='stylesheet' href='https://altjsdoit.github.io/thirdparty/pure/pure-min.css' />
+<script src='https://altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js'></script>
+<link rel='stylesheet' href='https://altjsdoit.github.io/thirdparty/pure/pure-min.css' />
 <style>
 header#menu nav input[type="radio"] {
   display: none;
@@ -98,8 +99,8 @@ textarea,
 code {
   font-family: 'Menlo', 'Monaco', 'Andale Mono', 'lucida console', 'Courier New', 'monospace' !important;
 }
-
 </style>
+
 </head>
 <body>
 
@@ -248,7 +249,7 @@ code {
         </fieldset>
         <fieldset>
           <legend>About</legend>
-          <p>AltJSDoIt 0.10.22 delta</p>
+          <p>AltJSDoIt 0.10.25 epsilon</p>
           <p><a target="_blank" href="https://github.com/altjsdoit/" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
         </fieldset>
       </form>
@@ -944,9 +945,9 @@ Compiler = (function() {
             } else {
               return new WMURLShortener().shorten(savedurl, function(err, shortUrl) {
                 if (!!err) {
-                  return resolve(("<link rel='source' href='" + savedurl + "' />\n") + scripts(+"\n" + styles));
+                  return resolve(("<link rel='source' href='" + savedurl + "' />\n") + scripts + "\n" + styles);
                 } else {
-                  return resolve(("<link rel='source' href='" + shortUrl + "' />\n") + scripts(+"\n" + styles));
+                  return resolve(("<link rel='source' href='" + shortUrl + "' />\n") + scripts + "\n" + styles);
                 }
               });
             }
@@ -1680,7 +1681,7 @@ ACC = (function() {
   return ACC;
 
 })();
-
 </script>
+
 </body>
 </html>
