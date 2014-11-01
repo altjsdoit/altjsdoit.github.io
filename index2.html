@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Altjsdoit0.10.20 delta</title>
-<link rel='author' href='http://goo.gl/ZKxl5t'>
+<link rel='author' href='http://goo.gl/7dA7Hn'>
 
 <style>
 header#menu nav input[type="radio"] {
@@ -1280,12 +1280,13 @@ ACC = (function() {
       }
     },
     "JavaScript": {
+      "useIframe": true,
       "compiler": function() {
-        self.importScripts("https://altjsdoit.github.io/thirdparty/escodegen/esprima.js");
-        self.importScripts("https://altjsdoit.github.io/thirdparty/escodegen/escodegen.worker.js");
-        return self.addEventListener("message", function(_arg) {
-          var ast, code, err, error, html, js, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+        document.write("<script src='https://altjsdoit.github.io/thirdparty/escodegen/esprima.js'><" + "/script>\n");
+        document.write("<script src='https://altjsdoit.github.io/thirdparty/escodegen/escodegen.browser.js'><" + "/script>\n");
+        return window.addEventListener("message", function(_arg) {
+          var ast, code, err, error, html, js, origin, session, source, srcElement, _ref;
+          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             ast = esprima.parse(code, {
               raw: true,
@@ -1305,11 +1306,11 @@ ACC = (function() {
               stack: err.stack
             };
           }
-          return self.postMessage({
+          return (source || srcElement).postMessage({
             session: session,
             html: html,
             error: error
-          });
+          }, origin);
         });
       }
     },
