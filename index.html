@@ -1,18 +1,11 @@
 <!DOCTYPE html>
-<html lang="ja" manifest="manifest.appcache">
+<html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.28 epsilon</title>
-<meta name="Description" content="altjsdoit - A Simple WebApp Editor - "/>
-<meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade"/>
-<meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1"/>
-<base href="https://altjsdoit.github.io/"/>
-<link rel='source' href='https://goo.gl/RmBdLx' />
-<link rel="apple-touch-icon" href="./icon-128.png"/>
-<link rel="stylesheet" href="./thirdparty/codemirror/codemirror.css"/>
-<link rel="stylesheet" href="./thirdparty/codemirror/theme/solarized.css"/>
-<link rel="stylesheet" href="./thirdparty/codemirror/addon/dialog/dialog.css"/>
-<link rel="stylesheet" href="./thirdparty/pure/pure-min.css"/>
+<title>AltJSDoIt 0.10.30 epsilon</title>
+<link rel='source' href='http://goo.gl/bFbePz' />
+
+
 <style>
 header#menu nav input[type="radio"] {
   display: none;
@@ -107,6 +100,16 @@ code {
 
 </head>
 <body>
+
+<meta name="Description" content="altjsdoit - A Simple WebApp Editor - "/>
+<meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade"/>
+<meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1"/>
+<base href="https://altjsdoit.github.io/"/>
+<link rel="apple-touch-icon" href="./icon-128.png"/>
+<link rel="stylesheet" href="./thirdparty/codemirror/codemirror.css"/>
+<link rel="stylesheet" href="./thirdparty/codemirror/theme/solarized.css"/>
+<link rel="stylesheet" href="./thirdparty/codemirror/addon/dialog/dialog.css"/>
+<link rel="stylesheet" href="./thirdparty/pure/pure-min.css"/>
 <script src="./thirdparty/es6-shim/es6-shim.min.js"></script>
 <script src="./thirdparty/zepto/zepto.min.js"></script>
 <script src="./thirdparty/vue/vue.min.js"></script>
@@ -128,6 +131,7 @@ code {
 <script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
 <script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
 <script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
+<script src="./thirdparty/codemirror/mode/sml/sml-codemirror-mode.js"></script>
 <script src="https://platform.twitter.com/widgets.js"></script>
 <div id="wrapper">
   <header id="menu" v-on="change: change" class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
@@ -243,7 +247,7 @@ code {
         </fieldset>
         <fieldset>
           <legend>About</legend>
-          <p>AltJSDoIt 0.10.28 epsilon</p>
+          <p>AltJSDoIt 0.10.30 epsilon</p>
           <p><a target="_blank" href="https://github.com/altjsdoit/" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
         </fieldset>
       </form>
@@ -615,10 +619,10 @@ Editor = (function() {
     "JavaScript": "text/javascript",
     "TypeScript": "text/typescript",
     "Traceur": "text/typescript",
-    "CoffeeScript": "text/x-coffeescript.",
-    "BlackCoffee": "text/x-coffeescript.",
+    "CoffeeScript": "text/x-coffeescript",
+    "BlackCoffee": "text/x-coffeescript",
     "Roy": "text/x-haskell",
-    "PureScript": "text/x-haskell.",
+    "PureScript": "text/x-haskell",
     "LiveScript": "text/x-livescript",
     "GorillaScript": "text/x-livescript",
     "LispyScript": "text/x-common-lisp",
