@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html manifest="./manifest.appcache">
+<html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.35 epsilon</title>
-<link rel='source' href='http://goo.gl/m8jE3p' />
+<title>AltJSDoIt 0.10.36 epsilon</title>
+<link rel='source' href='http://goo.gl/Hpd1Ff' />
 
 
 <style>
@@ -1669,6 +1669,7 @@ ACC = (function() {
     "PureScript": {
       "compiler": function() {
         var prelude, promises, wget;
+        self.importScripts("https://altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js");
         self.importScripts("https://altjsdoit.github.io/thirdparty/purescript/PureScript.browserify.js");
         self.addEventListener("message", function(_arg) {
           var code, err, error, html, result, session, _ref, _ref1;
