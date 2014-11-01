@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>AltJSDoIt 0.10.22 delta</title>
-<link rel='author' href='http://goo.gl/b8GM80'>
+<link rel='author' href='http://goo.gl/NEFHHh'>
 
 <style>
 header#menu nav input[type="radio"] {
@@ -167,13 +167,15 @@ code {
             <select v-model="altjs" data-config="altjs">
               <option value="JavaScript" selected="selected">JavaScript</option>
               <option value="CoffeeScript">CoffeeScript</option>
-              <option value="LiveScript">LiveScript</option>
               <option value="TypeScript">TypeScript</option>
-              <option value="PureScript">PureScript</option>
               <option value="Traceur">Traceur</option>
-              <option value="BlackCoffee">BlackCoffee</option>
+              <option value="LiveScript">LiveScript</option>
+              <option value="PureScript">PureScript</option>
+              <option value="GorillaScript">GorillaScript</option>
               <option value="BiwaScheme">BiwaScheme</option>
               <option value="Wisp">Wisp</option>
+              <option value="LispyScript">LispyScript</option>
+              <option value="BlackCoffee">BlackCoffee</option>
             </select>
           </label>
           <label>althtml:
@@ -572,6 +574,8 @@ Editor = (function() {
     "BlackCoffee": "coffeescript",
     "PureScript": "haskell",
     "LiveScript": "livescript",
+    "GorillaScript": "livescript",
+    "LispyScript": "scheme",
     "Wisp": "clojure",
     "BiwaScheme ": "scheme",
     "HTML": "xml",
@@ -1522,7 +1526,7 @@ ACC = (function() {
     "Wisp": {
       "useIframe": true,
       "compiler": function() {
-        document.write("<script src='https://dl.dropboxusercontent.com/u/265158/wisp.js'><" + "/script>\n");
+        document.write("<script src='https://altjsdoit.github.io/thirdparty/wisp/wisp.js'><" + "/script>\n");
         return window.addEventListener("message", function(_arg) {
           var code, err, error, html, js, origin, session, source, srcElement, _ref, _ref1;
           (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
@@ -1532,8 +1536,33 @@ ACC = (function() {
               throw new Error(error);
             }
             js = js.replace(/\/\/\#\ssourceMappingURL\=data\:application\/json\;base64\,.+\n/, "");
-            html = "<script src='https://dl.dropboxusercontent.com/u/265158/wisp.js'><" + "/script>\n";
+            html = "<script src='https://altjsdoit.github.io/thirdparty/wisp/wisp.js'><" + "/script>\n";
             html += "<script>\n" + js + "\n<" + "/script>\n";
+          } catch (_error) {
+            err = _error;
+            error = {
+              message: err.message,
+              stack: err.stack
+            };
+          }
+          return (source || srcElement).postMessage({
+            session: session,
+            html: html,
+            error: error
+          }, origin);
+        });
+      }
+    },
+    "LispyScript": {
+      "useIframe": true,
+      "compiler": function() {
+        document.write("<script src='https://altjsdoit.github.io/thirdparty/lispyscript/lispyscript.js'><" + "/script>\n");
+        return window.addEventListener("message", function(_arg) {
+          var code, err, error, html, js, origin, session, source, srcElement, _ref;
+          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          try {
+            js = lispyscript._compile(code);
+            html = "<script>\n" + js + "<" + "/script>\n";
           } catch (_error) {
             err = _error;
             error = {
