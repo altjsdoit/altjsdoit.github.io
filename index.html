@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.36 epsilon</title>
-<link rel='source' href='http://goo.gl/Hpd1Ff' />
+<title>AltJSDoIt 0.10.37 epsilon</title>
+<link rel='source' href='http://goo.gl/fgmccM' />
 
 
 <style>
@@ -999,9 +999,9 @@ Compiler = (function() {
             } else {
               return new WMURLShortener().shorten(savedurl, function(err, shortUrl) {
                 if (!!err) {
-                  return resolve(("<link rel='source' href='" + savedurl + "' />\n") + scripts + "\n" + styles);
+                  return resolve(("<meta name='generator' content='AltJSDoIt' url='" + savedurl + "' />\n") + scripts + "\n" + styles);
                 } else {
-                  return resolve(("<link rel='source' href='" + shortUrl + "' />\n") + scripts + "\n" + styles);
+                  return resolve(("<meta name='generator' content='AltJSDoIt' url='" + shortUrl + "' />\n") + scripts + "\n" + styles);
                 }
               });
             }
@@ -1021,7 +1021,7 @@ Compiler = (function() {
               if (!!err) {
                 throw new Error(err);
               }
-              link = "<script id='FirebugLite' FirebugLite='4' src='" + firebugURL + "'>\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n<" + "/" + "script>\n" + link;
+              link = "<script id='FirebugLite' FirebugLite='4' src='" + firebugURL + "'>\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n<" + "/" + "script>\n<script>\nwindow.addEventListener(\"error\", function(ev){\n  console.error(ev.message + \"\\n  at \" + ev.filename + \":\" + ev.lineno + \":\" + ev.colno);\n  console.error(ev.error.stack);\n  console.error(ev.error);\n});\n<" + "/" + "script>\n" + link;
               return callback(null, _this.createHTML(js, html, css, link));
             });
           } else {
@@ -1145,8 +1145,10 @@ ACC = (function() {
     });
     url = URL.createObjectURL(blob);
     worker = new Worker(url);
-    worker.onerror = function(err) {
-      console.error(err, "" + err.message + "\nat " + err.filename + ":" + err.lineno + ":" + err.colno);
+    worker.onerror = function(ev) {
+      console.error("" + ev.message + "\nat " + ev.filename + ":" + ev.lineno + ":" + ev.colno);
+      console.error(ev.error.stack);
+      console.error(ev.error);
       return console.info(("(" + fn + "());").slice(0, 300) + "\n...");
     };
     return {
