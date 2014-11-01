@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.30 epsilon</title>
-<link rel='source' href='http://goo.gl/bFbePz' />
+<title>AltJSDoIt 0.10.31 epsilon</title>
+<link rel='source' href='http://goo.gl/60bRrj' />
 
 
 <style>
@@ -267,6 +267,14 @@ window.URL = window.URL || window.webkitURL || window.mozURL;
 
 $(function() {
   var $config, $editor, $pages, $sandbox, altcss, althtml, altjs, compile, compiler, config, configure, editor, sandbox, twitElm, urlElm, _ref;
+  window.applicationCache.addEventListener('updateready', function(ev) {});
+  if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
+    window.applicationCache.swapCache();
+    if (confirm('A new version of this site is available. Save and load it?')) {
+      configure.save(editor.get());
+      location.reload();
+    }
+  }
   config = {
     timestamp: Date.now()
   };
