@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja" manifest="manifest.appcache">
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.25 epsilon</title>
-<link rel='source' href='http://goo.gl/t8GW6z' />
+<title>AltJSDoIt 0.10.28 epsilon</title>
+<link rel='source' href='http://goo.gl/8YgPvE' />
 <script src='https://altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js'></script>
 <script src='https://altjsdoit.github.io/thirdparty/mathjs/math.min.js'></script>
 <script src='https://altjsdoit.github.io/thirdparty/processing.js/processing.min.js'></script>
@@ -131,6 +131,7 @@ code {
 <script src="./thirdparty/codemirror/mode/jade/jade.js"></script>
 <script src="./thirdparty/codemirror/mode/css/css.js"></script>
 <script src="./thirdparty/codemirror/mode/scheme/scheme.js"></script>
+<script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
 <script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
 <script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
 <script src="./thirdparty/codemirror/mode/sml/sml-codemirror-mode.js"></script>
@@ -249,7 +250,7 @@ code {
         </fieldset>
         <fieldset>
           <legend>About</legend>
-          <p>AltJSDoIt 0.10.25 epsilon</p>
+          <p>AltJSDoIt 0.10.28 epsilon</p>
           <p><a target="_blank" href="https://github.com/altjsdoit/" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
         </fieldset>
       </form>
@@ -515,8 +516,14 @@ Configure = (function() {
 
 Editor = (function() {
   function Editor(textarea, config) {
+    var $radios, changeTab;
     this.textarea = textarea;
     this.config = config;
+    $radios = $("#menu input[type=radio]");
+    console.log($radios);
+    changeTab = function(selector) {
+      return $(selector).click();
+    };
     this.option = {
       tabMode: "indent",
       tabSize: 2,
@@ -550,6 +557,46 @@ Editor = (function() {
           return function(cm) {
             return _this.onsave();
           };
+        })(this),
+        "Cmd-1": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab1");
+          };
+        })(this),
+        "Ctrl-1": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab1");
+          };
+        })(this),
+        "Cmd-2": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab2");
+          };
+        })(this),
+        "Ctrl-2": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab2");
+          };
+        })(this),
+        "Cmd-3": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab3");
+          };
+        })(this),
+        "Ctrl-3": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab3");
+          };
+        })(this),
+        "Cmd-4": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab4");
+          };
+        })(this),
+        "Ctrl-4": (function(_this) {
+          return function(cm) {
+            return changeTab("#tab4");
+          };
         })(this)
       }
     };
@@ -573,20 +620,22 @@ Editor = (function() {
 
   Editor.prototype.langToModeMap = {
     "JavaScript": "javascript",
-    "TypeScript": "javascript",
-    "Traceur": "javascript",
+    "TypeScript": "text/typescript",
+    "Traceur": "text/typescript",
     "CoffeeScript": "coffeescript",
     "BlackCoffee": "coffeescript",
+    "Roy": "haskell",
     "PureScript": "haskell",
     "LiveScript": "livescript",
     "GorillaScript": "livescript",
-    "LispyScript": "scheme",
+    "LispyScript": "commonlisp",
     "Wisp": "clojure",
     "BiwaScheme ": "scheme",
     "HTML": "xml",
     "Jade": "jade",
     "CSS": "css",
-    "Stylus": "css"
+    "Stylus": "css",
+    "LESS": "text/x-less"
   };
 
   Editor.prototype.constructCM = function() {
@@ -1459,7 +1508,7 @@ ACC = (function() {
     },
     "TypeScript": {
       "compiler": function() {
-        self.importScripts("https://altjsdoit.github.io/thirdparty/typescript/typescript.js");
+        self.importScripts("https://altjsdoit.github.io/thirdparty/typescript/typescript.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, current, diagnostics, err, error, filename, html, iter, js, output, session, snapshot, _compiler, _ref;
           _ref = _arg.data, session = _ref.session, code = _ref.code;
@@ -1482,7 +1531,7 @@ ACC = (function() {
               if (!output) {
                 throw new Error(err);
               }
-              console.error(err);
+              console.info(err);
             }
             js = output.split("\r\n").join("\n");
             html = "<script>\n" + js + "<" + "/script>\n";
