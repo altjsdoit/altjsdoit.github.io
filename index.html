@@ -2,8 +2,8 @@
 <html manifest="./manifest.appcache">
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.33 epsilon</title>
-<link rel='source' href='http://goo.gl/bmkm3k' />
+<title>AltJSDoIt 0.10.35 epsilon</title>
+<link rel='source' href='http://goo.gl/m8jE3p' />
 
 
 <style>
@@ -247,7 +247,9 @@ code {
         </fieldset>
         <fieldset>
           <legend>About</legend>
-          <p>AltJSDoIt 0.10.32epsilon</p>
+          <p>
+            <script>document.write($("title").html());</script>
+          </p>
           <p><a target="_blank" href="https://github.com/altjsdoit/" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
         </fieldset>
       </form>
@@ -261,11 +263,11 @@ code {
   </section>
 </div>
 <script>
-var ACC, Compiler, Configure, Editor, Sandbox, initTwitter;
+var ACC, Compiler, Configure, Editor, Sandbox, initTwitter, main;
 
 window.URL = window.URL || window.webkitURL || window.mozURL;
 
-$(function() {
+main = function() {
   var $config, $editor, $pages, $sandbox, altcss, althtml, altjs, compile, compiler, config, configure, editor, sandbox, twitElm, urlElm, _ref;
   window.applicationCache.addEventListener('updateready', function(ev) {});
   if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
@@ -345,7 +347,6 @@ $(function() {
     methods: {
       save: function(ev) {
         var url;
-        console.log(ev);
         url = configure.save(editor.get());
         urlElm.value = url;
         return new WMURLShortener().shorten(url, function(err, shortUrl) {
@@ -380,7 +381,7 @@ $(function() {
   };
   sandbox = new Sandbox(document.getElementById("box-sandbox-iframe"), config);
   return compiler = new Compiler(config);
-});
+};
 
 (function() {
   var $main, $nav, $window;
@@ -634,7 +635,7 @@ Editor = (function() {
     "GorillaScript": "text/x-livescript",
     "LispyScript": "text/x-common-lisp",
     "Wisp": "text/x-clojure",
-    "BiwaScheme ": "scheme",
+    "BiwaScheme ": "text/x-scheme",
     "HTML": "text/html",
     "Jade": "text/x-jade",
     "CSS": "text/css",
@@ -1734,6 +1735,8 @@ ACC = (function() {
   return ACC;
 
 })();
+
+main();
 </script>
 
 </body>
