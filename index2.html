@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>AltJSDoIt 0.10.22 delta</title>
-<link rel='author' href='http://goo.gl/irTcTI'>
+<link rel='author' href='http://goo.gl/b8GM80'>
 
 <style>
 header#menu nav input[type="radio"] {
@@ -1181,7 +1181,7 @@ ACC = (function() {
     },
     "Jade": {
       "compiler": function() {
-        self.importScripts("https://altjsdoit.github.io/jade/jade.min.js");
+        self.importScripts("https://altjsdoit.github.io/thirdparty/jade/jade.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
           _ref = _arg.data, session = _ref.session, code = _ref.code;
@@ -1391,9 +1391,37 @@ ACC = (function() {
         });
       }
     },
+    "GorillaScript": {
+      "compiler": function() {
+        self.importScripts("https://altjsdoit.github.io/thirdparty/gorillascript/gorillascript.min.js");
+        return self.addEventListener("message", function(_arg) {
+          var code, err, error, html, js, session, _ref, _ref1;
+          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          try {
+            _ref1 = GorillaScript.compileSync(code), error = _ref1.error, js = _ref1.code;
+            if (!!error) {
+              throw new Error(error);
+            }
+            html = "<script src='https://altjsdoit.github.io/thirdparty/livescript/prelude-browser-min.js'><" + "/script>\n";
+            html += "<script>\n" + js + "<" + "/script>\n";
+          } catch (_error) {
+            err = _error;
+            error = {
+              message: err.message,
+              stack: err.stack
+            };
+          }
+          return self.postMessage({
+            session: session,
+            html: html,
+            error: error
+          });
+        });
+      }
+    },
     "TypeScript": {
       "compiler": function() {
-        self.importScripts("https://altjsdoit.github.io/thirdparty/typescript/typescript.min.js");
+        self.importScripts("https://altjsdoit.github.io/thirdparty/typescript/typescript.js");
         return self.addEventListener("message", function(_arg) {
           var code, current, diagnostics, err, error, filename, html, iter, js, output, session, snapshot, _compiler, _ref;
           _ref = _arg.data, session = _ref.session, code = _ref.code;
