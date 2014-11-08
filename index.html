@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>AltJSDoIt 0.10.37 epsilon</title>
-<link rel='source' href='http://goo.gl/fgmccM' />
+<title>AltJSDoIt 0.10.38 epsilon</title>
+<meta name='generator' content='AltJSDoIt' url='http://goo.gl/N5JbwJ' />
 
 
 <style>
@@ -114,7 +114,11 @@ code {
 <script src="./thirdparty/zepto/zepto.min.js"></script>
 <script src="./thirdparty/vue/vue.min.js"></script>
 <script src="./thirdparty/jszip/jszip.min.js"></script>
+<script src="./thirdparty/webmodule/WMAppCacheProxy.min.js"></script>
+<script src="./thirdparty/webmodule/WMDataURIScheme.min.js"></script>
+<script src="./thirdparty/webmodule/WMIframeInserter.min.js"></script>
 <script src="./thirdparty/webmodule/WMURLShortener.min.js"></script>
+<script src="./thirdparty/webmodule/WMIframeWorker.min.js"></script>
 <script src="./thirdparty/codemirror/codemirror.min.js"></script>
 <script src="./thirdparty/codemirror/addon/search/searchcursor.js"></script>
 <script src="./thirdparty/codemirror/addon/search/search.js"></script>
@@ -131,7 +135,6 @@ code {
 <script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
 <script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
 <script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
-<script src="./thirdparty/codemirror/mode/sml/sml-codemirror-mode.js"></script>
 <script src="https://platform.twitter.com/widgets.js"></script>
 <div id="wrapper">
   <header id="menu" v-on="change: change" class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
@@ -238,10 +241,11 @@ code {
           </label>
           <label>iframe type:
             <select v-model="iframeType">
-              <option value="message">message</option>
-              <option value="blob" selected="selected">objectURL</option>
+              <option value="blob" selected="selected">blobURL</option>
               <option value="srcdoc">srcdoc</option>
-              <option value="base64">dataURI</option>
+              <option value="base64">base64</option>
+              <option value="message">message</option>
+              <option value="write">write</option>
             </select>
           </label>
         </fieldset>
@@ -263,34 +267,34 @@ code {
   </section>
 </div>
 <script>
-var ACC, Compiler, Configure, Editor, Sandbox, initTwitter, main;
+var ACC, Compiler, Configure, Editor, Sandbox, initTwitter, main, save;
 
 window.URL = window.URL || window.webkitURL || window.mozURL;
 
 main = function() {
-  var $config, $editor, $pages, $sandbox, altcss, althtml, altjs, compile, compiler, config, configure, editor, sandbox, twitElm, urlElm, _ref;
+  var $config, $editor, $pages, $sandbox, altcss, althtml, altjs, compile, compiler, config, editor, obj, sandbox, twitElm, url, urlElm, _ref;
   window.applicationCache.addEventListener('updateready', function(ev) {});
   if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
     window.applicationCache.swapCache();
     if (confirm('A new version of this site is available. Save and load it?')) {
-      configure.save(editor.get());
+      obj = editor.get();
+      obj.config = config;
+      url = save(obj);
       location.reload();
     }
   }
-  config = {
-    timestamp: Date.now()
-  };
-  configure = new Configure(config);
-  _ref = configure.load(), altjs = _ref.altjs, althtml = _ref.althtml, altcss = _ref.altcss;
+  _ref = Configure.decodeHash(location.hash), config = _ref.config, altjs = _ref.altjs, althtml = _ref.althtml, altcss = _ref.altcss;
   console.dir(JSON.parse(JSON.stringify(config)));
   $pages = $("#main > *");
   $config = $("#box-config");
   $editor = $("#box-editor");
   $sandbox = $("#box-sandbox");
   compile = function(callback) {
-    var source, url;
+    var source;
     source = editor.get();
-    url = configure.save(source);
+    obj = editor.get();
+    obj.config = config;
+    url = save(obj);
     return compiler.compile(url, source, callback);
   };
   new Vue({
@@ -299,7 +303,9 @@ main = function() {
     methods: {
       change: function(ev) {
         if (ev.target.name === "tab") {
-          configure.save(editor.get());
+          obj = editor.get();
+          obj.config = config;
+          url = save(obj);
           $pages.hide();
           sandbox.stop();
           switch (ev.target.value) {
@@ -346,8 +352,9 @@ main = function() {
     data: config,
     methods: {
       save: function(ev) {
-        var url;
-        url = configure.save(editor.get());
+        obj = editor.get();
+        obj.config = config;
+        url = save(obj);
         urlElm.value = url;
         return new WMURLShortener().shorten(url, function(err, shortUrl) {
           if (!!err) {
@@ -369,7 +376,9 @@ main = function() {
     altcss: altcss
   });
   editor.onsave = function() {
-    return configure.save(editor.get());
+    obj = editor.get();
+    obj.config = config;
+    return save(obj);
   };
   editor.onrun = function() {
     return compile(function(err, html) {
@@ -418,8 +427,29 @@ initTwitter = function(elm, config, shortUrl) {
   return twttr.widgets.load();
 };
 
+save = function(_arg) {
+  var altcss, althtml, altjs, config, pwd, url, _config;
+  config = _arg.config, altjs = _arg.altjs, althtml = _arg.althtml, altcss = _arg.altcss;
+  config.timestamp = Date.now();
+  $("title").html("" + config.title + " - " + (new Date(config.timestamp)) + " - altjsdo.it");
+  _config = {
+    script: altjs,
+    markup: althtml,
+    style: altcss,
+    config: JSON.stringify(config)
+  };
+  pwd = location.protocol + '//' + location.hostname + location.port + location.pathname;
+  url = pwd + Configure.encodeHash(_config);
+  if (location.protocol !== "blob:") {
+    history.pushState(null, null, url);
+  }
+  return url;
+};
+
 Configure = (function() {
-  var decodeURIQuery, encodeURIQuery, pwd, unzipDataURI, zipDataURI;
+  var pwd, unzipDataURI, zipDataURI;
+
+  function Configure() {}
 
   pwd = location.protocol + '//' + location.hostname + location.port + location.pathname;
 
@@ -449,17 +479,54 @@ Configure = (function() {
     return hash;
   };
 
+  return Configure;
+
+})();
+
+Configure = (function() {
+  var decodeURIQuery, encodeURIQuery, unzipDataURI, zipDataURI;
+
+  function Configure() {}
+
+  zipDataURI = function(dic) {
+    var key, val, zip;
+    zip = new JSZip();
+    for (key in dic) {
+      val = dic[key];
+      zip.file(key, val);
+    }
+    return zip.generate({
+      compression: "DEFLATE"
+    });
+  };
+
+  unzipDataURI = function(base64) {
+    var files, hash, key, val, zip;
+    zip = new JSZip();
+    files = zip.load(base64, {
+      base64: true
+    }).files;
+    hash = {};
+    for (key in files) {
+      val = files[key];
+      hash[key] = zip.file(key).asText();
+    }
+    return hash;
+  };
+
   encodeURIQuery = function(dic) {
     var key, val;
-    return ((function() {
-      var _results;
-      _results = [];
-      for (key in dic) {
-        val = dic[key];
-        _results.push(key + "=" + encodeURIComponent(val));
-      }
-      return _results;
-    })()).join("&");
+    return [
+      (function() {
+        var _results;
+        _results = [];
+        for (key in dic) {
+          val = dic[key];
+          _results.push(key + "=" + encodeURIComponent(val));
+        }
+        return _results;
+      })()
+    ].join("&");
   };
 
   decodeURIQuery = function(query) {
@@ -473,47 +540,31 @@ Configure = (function() {
     }), {});
   };
 
-  function Configure(config) {
-    this.config = config;
-  }
-
-  Configure.prototype.load = function() {
-    var key, markup, script, style, zip, __config, _config, _ref;
-    zip = decodeURIQuery(location.hash.slice(1)).zip;
+  Configure.decodeHash = function(hash) {
+    var config, key, markup, script, style, zip, __config, _config, _ref;
+    config = {};
+    zip = decodeURIQuery(hash.slice(1)).zip;
     if (zip != null) {
       _ref = unzipDataURI(zip), _config = _ref.config, script = _ref.script, markup = _ref.markup, style = _ref.style;
       __config = JSON.parse(_config);
       if (!!__config) {
         for (key in __config) {
-          this.config[key] = __config[key];
+          config[key] = __config[key];
         }
       }
     }
     return {
+      config: config,
       altjs: script || null,
       althtml: markup || null,
       altcss: style || null
     };
   };
 
-  Configure.prototype.save = function(_arg) {
-    var altcss, althtml, altjs, url, _config;
-    altjs = _arg.altjs, althtml = _arg.althtml, altcss = _arg.altcss;
-    this.config.timestamp = Date.now();
-    _config = {
-      script: altjs,
-      markup: althtml,
-      style: altcss,
-      config: JSON.stringify(this.config)
-    };
-    $("title").html("" + this.config.title + " - " + (new Date(this.config.timestamp)) + " - altjsdo.it");
-    url = pwd + "#" + encodeURIQuery({
-      zip: zipDataURI(_config)
+  Configure.encodeHash = function(dic) {
+    return "#" + encodeURIQuery({
+      zip: zipDataURI(dic)
     });
-    if (location.protocol !== "blob:") {
-      history.pushState(null, null, url);
-    }
-    return url;
   };
 
   return Configure;
@@ -722,52 +773,24 @@ Editor = (function() {
 })();
 
 Sandbox = (function() {
-  var stringToDataURI;
-
-  stringToDataURI = function(data, mimetype, callback) {
-    var reader;
-    reader = new FileReader();
-    reader.readAsDataURL(new Blob([data], {
-      type: mimetype
-    }));
-    reader.onloadend = function() {
-      return callback(null, reader.result.replace(";base64,", ";charset=utf-8;base64,"));
-    };
-    return reader.onerror = function(err) {
-      return callback(err, "");
-    };
-  };
-
   function Sandbox(iframe, config) {
     this.iframe = iframe;
     this.config = config;
+    this.inserter = new WMIframeInserter(this.iframe);
   }
 
   Sandbox.prototype.run = function(srcdoc) {
-    var url;
     switch (this.config.iframeType) {
+      case "write":
+        return this.inserter.write(srcdoc);
       case "blob":
-        url = URL.createObjectURL(new Blob([srcdoc], {
-          type: "text/html"
-        }));
-        return this.iframe.setAttribute("src", url);
+        return this.inserter.blobURL(srcdoc);
       case "srcdoc":
-        return this.iframe.setAttribute("srcdoc", srcdoc);
+        return this.inserter.srcdoc(srcdoc);
       case "base64":
-        return stringToDataURI(srcdoc, "text/html", (function(_this) {
-          return function(err, base64) {
-            console.error(err);
-            return _this.iframe.setAttribute("src", base64);
-          };
-        })(this));
+        return this.inserter.dataURI(srcdoc);
       case "message":
-        this.iframe.setAttribute("src", "https://altjsdoit.github.io/iframe.html");
-        return this.iframe.onload = (function(_this) {
-          return function() {
-            _this.iframe.onload = null;
-            return _this.iframe.contentWindow.postMessage(srcdoc, "*");
-          };
-        })(this);
+        return this.inserter.message(srcdoc, "https://altjsdoit.github.io/thirdparty/webmodule/iframe.html");
       default:
         throw new Error("unknown iframe type: " + config.iframeType);
     }
@@ -1067,13 +1090,11 @@ Compiler = (function() {
 })();
 
 ACC = (function() {
-  var createIFrameWorker, createSessionKey, createWorker;
-
   function ACC(name) {
     var compiler, useIframe, _ref;
     this.name = name;
     _ref = ACC.compilers[this.name], useIframe = _ref.useIframe, compiler = _ref.compiler;
-    this.worker = !!useIframe ? createIFrameWorker(compiler) : createWorker(compiler);
+    this.worker = !!useIframe ? WMIframeWorker.createIframeWorker(compiler) : WMIframeWorker.createWorker(compiler);
   }
 
   ACC.prototype.compile = function(code, callback) {
@@ -1088,101 +1109,13 @@ ACC = (function() {
     return this.worker.terminate();
   };
 
-  createSessionKey = function() {
-    return Math.round(Math.random() * Math.pow(16, 8)).toString(16);
-  };
-
-  createIFrameWorker = function(fn) {
-    var blob, iframe, loaded, url;
-    blob = new Blob(["<script>(" + fn + "());<" + "/script>"], {
-      type: "text/html"
-    });
-    url = URL.createObjectURL(blob);
-    iframe = document.createElement("iframe");
-    iframe.setAttribute("style", "position:absolute;top:0px;left:0px;width:0px;height:0px;border:0px;margin:0px;padding:0px;");
-    iframe.setAttribute("src", url);
-    loaded = false;
-    iframe.onload = function() {
-      return loaded = true;
-    };
-    document.body.appendChild(iframe);
-    return {
-      load: function(fn) {
-        if (loaded) {
-          return setTimeout(fn);
-        } else {
-          return setTimeout(this.load.bind(this, fn), 100);
-        }
-      },
-      request: function(code, callback) {
-        var data;
-        data = {
-          code: code,
-          session: createSessionKey()
-        };
-        window.addEventListener("message", function(_arg) {
-          var error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, html = _ref.html, error = _ref.error;
-          window.removeEventListener("message", arguments.callee);
-          if (session === data.session) {
-            return callback(error, html);
-          }
-        });
-        return iframe.contentWindow.postMessage(data, "*");
-      },
-      terminate: function() {
-        iframe.onload = null;
-        iframe.removeAttribute("src");
-        return document.body.removeChild(iframe);
-      }
-    };
-  };
-
-  createWorker = function(fn) {
-    var blob, url, worker;
-    blob = new Blob(["(" + fn + "());"], {
-      type: "text/javascript"
-    });
-    url = URL.createObjectURL(blob);
-    worker = new Worker(url);
-    worker.onerror = function(ev) {
-      console.error("" + ev.message + "\nat " + ev.filename + ":" + ev.lineno + ":" + ev.colno);
-      console.error(ev.error.stack);
-      console.error(ev.error);
-      return console.info(("(" + fn + "());").slice(0, 300) + "\n...");
-    };
-    return {
-      load: function(fn) {
-        return setTimeout(fn, 0);
-      },
-      request: function(code, callback) {
-        var data;
-        data = {
-          code: code,
-          session: createSessionKey()
-        };
-        worker.postMessage(data);
-        return worker.onmessage = function(_arg) {
-          var error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, html = _ref.html, error = _ref.error;
-          if (session === data.session) {
-            return callback(error, html);
-          }
-        };
-      },
-      terminate: function() {
-        return worker.terminate();
-      }
-    };
-  };
-
   ACC.compilers = {
     "echoIframe": {
       "useIframe": true,
       "compiler": function() {
         return window.addEventListener("message", function(_arg) {
           var code, err, error, html, origin, session, source, srcElement, _ref;
-          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          (_ref = _arg.data, session = _ref.session, code = _ref.data), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             html = code;
           } catch (_error) {
@@ -1194,7 +1127,7 @@ ACC = (function() {
           }
           return (source || srcElement).postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           }, origin);
         });
@@ -1204,7 +1137,7 @@ ACC = (function() {
       "compiler": function() {
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             html = code;
           } catch (_error) {
@@ -1216,7 +1149,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1226,7 +1159,7 @@ ACC = (function() {
       "compiler": function() {
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             html = code;
           } catch (_error) {
@@ -1238,7 +1171,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1249,7 +1182,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/jade/jade.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             html = jade.compile(code, {
               pretty: true
@@ -1263,7 +1196,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1273,12 +1206,12 @@ ACC = (function() {
       "compiler": function() {
         return self.addEventListener("message", function(_arg) {
           var code, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           error = null;
           html = "<style>\n" + code + "\n</style>\n";
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1289,7 +1222,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/stylus/stylus.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           html = "";
           try {
             stylus.render(code, {}, function(err, css) {
@@ -1307,7 +1240,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1319,7 +1252,7 @@ ACC = (function() {
         document.write("<script src='https://altjsdoit.github.io/thirdparty/less.js/less.min.js'><" + "/script>\n");
         return window.addEventListener("message", function(_arg) {
           var code, err, error, html, origin, parser, session, source, srcElement, _ref;
-          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          (_ref = _arg.data, session = _ref.session, code = _ref.data), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           html = "";
           try {
             parser = new less.Parser({});
@@ -1338,7 +1271,7 @@ ACC = (function() {
           }
           return (source || srcElement).postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           }, origin);
         });
@@ -1351,7 +1284,7 @@ ACC = (function() {
         document.write("<script src='https://altjsdoit.github.io/thirdparty/escodegen/escodegen.browser.js'><" + "/script>\n");
         return window.addEventListener("message", function(_arg) {
           var ast, code, err, error, html, js, origin, session, source, srcElement, _ref;
-          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          (_ref = _arg.data, session = _ref.session, code = _ref.data), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             ast = esprima.parse(code, {
               raw: true,
@@ -1373,7 +1306,7 @@ ACC = (function() {
           }
           return (source || srcElement).postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           }, origin);
         });
@@ -1384,7 +1317,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/coffee-script/coffee-script.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, js, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             js = CoffeeScript.compile(code, {
               bare: true
@@ -1399,7 +1332,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1410,7 +1343,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/coffee-script/black-coffee-script.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, js, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             js = CoffeeScript.compile(code, {
               bare: true
@@ -1425,7 +1358,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1436,7 +1369,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/livescript/livescript.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, js, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             js = LiveScript.compile(code);
             html = "<script src='https://altjsdoit.github.io/thirdparty/livescript/prelude-browser-min.js'><" + "/script>\n";
@@ -1450,7 +1383,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1461,7 +1394,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/gorillascript/gorillascript.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, js, session, _ref, _ref1;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             _ref1 = GorillaScript.compileSync(code), error = _ref1.error, js = _ref1.code;
             if (!!error) {
@@ -1478,7 +1411,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1490,7 +1423,7 @@ ACC = (function() {
         document.write("<script src='https://altjsdoit.github.io/thirdparty/roy/roy-min.js'><" + "/script>\n");
         return window.addEventListener("message", function(_arg) {
           var code, err, error, html, js, origin, session, source, srcElement, _ref;
-          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          (_ref = _arg.data, session = _ref.session, code = _ref.data), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             js = roy.compile(code, {}, {}, {
               modules: {
@@ -1507,7 +1440,7 @@ ACC = (function() {
           }
           return (source || srcElement).postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           }, origin);
         });
@@ -1518,7 +1451,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/typescript/typescript.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, current, diagnostics, err, error, filename, html, iter, js, output, session, snapshot, _compiler, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             filename = "jsdo.it.ts";
             _compiler = new TypeScript.TypeScriptCompiler(filename);
@@ -1551,7 +1484,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1561,7 +1494,7 @@ ACC = (function() {
       "compiler": function() {
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             html = '<script src="https://altjsdoit.github.io/thirdparty/traceur/traceur.js"><' + '/script>\n';
             html += '<script src="https://altjsdoit.github.io/thirdparty/traceur/bootstrap.js"><' + '/script>\n';
@@ -1578,7 +1511,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1588,7 +1521,7 @@ ACC = (function() {
       "compiler": function() {
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, session, _ref;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           try {
             html = "<script src='https://altjsdoit.github.io/thirdparty/biwascheme/biwascheme-0.6.2-min.js'><" + "/script>\n";
             html += "<script id='biwa-scheme' type='text/scheme'>\n";
@@ -1607,7 +1540,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
@@ -1619,7 +1552,7 @@ ACC = (function() {
         document.write("<script src='https://altjsdoit.github.io/thirdparty/wisp/wisp.js'><" + "/script>\n");
         return window.addEventListener("message", function(_arg) {
           var code, err, error, html, js, origin, session, source, srcElement, _ref, _ref1;
-          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          (_ref = _arg.data, session = _ref.session, code = _ref.data), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             _ref1 = wisp.compile(code), error = _ref1.error, js = _ref1.code;
             if (!!error) {
@@ -1637,7 +1570,7 @@ ACC = (function() {
           }
           return (source || srcElement).postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           }, origin);
         });
@@ -1649,7 +1582,7 @@ ACC = (function() {
         document.write("<script src='https://altjsdoit.github.io/thirdparty/lispyscript/lispyscript.js'><" + "/script>\n");
         return window.addEventListener("message", function(_arg) {
           var code, err, error, html, js, origin, session, source, srcElement, _ref;
-          (_ref = _arg.data, session = _ref.session, code = _ref.code), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
+          (_ref = _arg.data, session = _ref.session, code = _ref.data), source = _arg.source, srcElement = _arg.srcElement, origin = _arg.origin;
           try {
             js = lispyscript._compile(code);
             html = "<script>\n" + js + "<" + "/script>\n";
@@ -1662,7 +1595,7 @@ ACC = (function() {
           }
           return (source || srcElement).postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           }, origin);
         });
@@ -1675,7 +1608,7 @@ ACC = (function() {
         self.importScripts("https://altjsdoit.github.io/thirdparty/purescript/PureScript.browserify.js");
         self.addEventListener("message", function(_arg) {
           var code, err, error, html, result, session, _ref, _ref1;
-          _ref = _arg.data, session = _ref.session, code = _ref.code;
+          _ref = _arg.data, session = _ref.session, code = _ref.data;
           if (prelude.length === 0) {
             return setTimeout(Function.prototype.bind.apply(arguments.callee, [this].concat(Array.prototype.slice.call(arguments))), 0);
           }
@@ -1694,7 +1627,7 @@ ACC = (function() {
           }
           return self.postMessage({
             session: session,
-            html: html,
+            data: html,
             error: error
           });
         });
