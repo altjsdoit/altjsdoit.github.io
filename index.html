@@ -1,12 +1,46 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8" />
+<html manifest="appcache.manifest">
+  <head>
+    <meta charset="UTF-8">
 <title>AltJSDoIt 0.11.11 eta</title>
-<meta name='generator' content='AltJSDoIt' url='http://goo.gl/QSLRme' />
+    <meta name="Description" content="altjsdoit - A Simple WebApp Editor - ">
+    <meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade">
+    <meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1">
+<meta name='generator' content='AltJSDoIt' generator='http://goo.gl/48wVME' url='http://goo.gl/YUghgg' />
 
-
-<style>
+    <base href="https://altjsdoit.github.io/">
+    <link rel="apple-touch-icon" href="./icon-128.png">
+    <link rel="stylesheet" href="./thirdparty/codemirror/codemirror.css">
+    <link rel="stylesheet" href="./thirdparty/codemirror/theme/solarized.css">
+    <link rel="stylesheet" href="./thirdparty/codemirror/addon/dialog/dialog.css">
+    <link rel="stylesheet" href="./thirdparty/pure/pure-min.css">
+    <script src="./thirdparty/es6-shim/es6-shim.min.js"></script>
+    <script src="./thirdparty/zepto/zepto.min.js"></script>
+    <script src="./thirdparty/underscore.js/underscore-min.js"></script>
+    <script src="./thirdparty/vue/vue.min.js"></script>
+    <script src="./thirdparty/jszip/jszip.min.js"></script>
+    <script src="./thirdparty/webmodule/WMAppCacheProxy.min.js"></script>
+    <script src="./thirdparty/webmodule/WMDataURIScheme.min.js"></script>
+    <script src="./thirdparty/webmodule/WMIframeInserter.min.js"></script>
+    <script src="./thirdparty/webmodule/WMURLShortener.min.js"></script>
+    <script src="./thirdparty/webmodule/WMIframeWorker.min.js"></script>
+    <script src="./thirdparty/codemirror/codemirror.min.js"></script>
+    <script src="./thirdparty/codemirror/addon/search/searchcursor.js"></script>
+    <script src="./thirdparty/codemirror/addon/search/search.js"></script>
+    <script src="./thirdparty/codemirror/addon/dialog/dialog.js"></script>
+    <script src="./thirdparty/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="./thirdparty/codemirror/addon/edit/closebrackets.js"></script>
+    <script src="./thirdparty/codemirror/mode/javascript/javascript.js"></script>
+    <script src="./thirdparty/codemirror/mode/coffeescript/coffeescript.js"></script>
+    <script src="./thirdparty/codemirror/mode/haskell/haskell.js"></script>
+    <script src="./thirdparty/codemirror/mode/xml/xml.js"></script>
+    <script src="./thirdparty/codemirror/mode/jade/jade.js"></script>
+    <script src="./thirdparty/codemirror/mode/css/css.js"></script>
+    <script src="./thirdparty/codemirror/mode/scheme/scheme.js"></script>
+    <script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
+    <script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
+    <script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
+    <script src="https://platform.twitter.com/widgets.js"></script><style>
 header#menu nav input[type="radio"] {
   display: none;
 }
@@ -98,48 +132,6 @@ code {
 }
 </style>
 
-</head>
-<body>
-<!DOCTYPE html>
-<html manifest="appcache">
-  <head>
-    <meta charset="UTF-8"><%= title %>
-    <meta name="Description" content="altjsdoit - A Simple WebApp Editor - ">
-    <meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade">
-    <meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1"><%= imports %>
-    <base href="https://altjsdoit.github.io/">
-    <link rel="apple-touch-icon" href="./icon-128.png">
-    <link rel="stylesheet" href="./thirdparty/codemirror/codemirror.css">
-    <link rel="stylesheet" href="./thirdparty/codemirror/theme/solarized.css">
-    <link rel="stylesheet" href="./thirdparty/codemirror/addon/dialog/dialog.css">
-    <link rel="stylesheet" href="./thirdparty/pure/pure-min.css">
-    <script src="./thirdparty/es6-shim/es6-shim.min.js"></script>
-    <script src="./thirdparty/zepto/zepto.min.js"></script>
-    <script src="./thirdparty/underscore.js/underscore-min.js"></script>
-    <script src="./thirdparty/vue/vue.min.js"></script>
-    <script src="./thirdparty/jszip/jszip.min.js"></script>
-    <script src="./thirdparty/webmodule/WMAppCacheProxy.min.js"></script>
-    <script src="./thirdparty/webmodule/WMDataURIScheme.min.js"></script>
-    <script src="./thirdparty/webmodule/WMIframeInserter.min.js"></script>
-    <script src="./thirdparty/webmodule/WMURLShortener.min.js"></script>
-    <script src="./thirdparty/webmodule/WMIframeWorker.min.js"></script>
-    <script src="./thirdparty/codemirror/codemirror.min.js"></script>
-    <script src="./thirdparty/codemirror/addon/search/searchcursor.js"></script>
-    <script src="./thirdparty/codemirror/addon/search/search.js"></script>
-    <script src="./thirdparty/codemirror/addon/dialog/dialog.js"></script>
-    <script src="./thirdparty/codemirror/addon/edit/matchbrackets.js"></script>
-    <script src="./thirdparty/codemirror/addon/edit/closebrackets.js"></script>
-    <script src="./thirdparty/codemirror/mode/javascript/javascript.js"></script>
-    <script src="./thirdparty/codemirror/mode/coffeescript/coffeescript.js"></script>
-    <script src="./thirdparty/codemirror/mode/haskell/haskell.js"></script>
-    <script src="./thirdparty/codemirror/mode/xml/xml.js"></script>
-    <script src="./thirdparty/codemirror/mode/jade/jade.js"></script>
-    <script src="./thirdparty/codemirror/mode/css/css.js"></script>
-    <script src="./thirdparty/codemirror/mode/scheme/scheme.js"></script>
-    <script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
-    <script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
-    <script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
-    <script src="https://platform.twitter.com/widgets.js"></script><%= style %>
   </head>
   <body>
     <div id="wrapper">
@@ -274,10 +266,7 @@ code {
           <iframe id="box-sandbox-iframe"></iframe>
         </section>
       </section>
-    </div><%= script %>
-  </body>
-</html>
-<script>
+    </div><script>
 var ACC, Compiler, Configure, Editor, Sandbox, initTwitter, main, save;
 
 window.URL = window.URL || window.webkitURL || window.mozURL;
@@ -1598,5 +1587,5 @@ ACC = (function() {
 main();
 </script>
 
-</body>
+  </body>
 </html>
