@@ -1,46 +1,12 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-<title>AltJSDoIt 0.11.11 eta</title>
-    <meta name="Description" content="altjsdoit - A Simple WebApp Editor - ">
-    <meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade">
-    <meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1">
-<meta name='generator' content='AltJSDoIt' generator='http://goo.gl/E4XFPg' url='http://goo.gl/48wVME' />
+<html manifest="manifest.appcache">
+<head>
+<meta charset="UTF-8" />
+<title>AltJSDoIt 0.10.38 epsilon</title>
+<meta name='generator' content='AltJSDoIt' url='http://goo.gl/N5JbwJ' />
 
-    <base href="https://altjsdoit.github.io/">
-    <link rel="apple-touch-icon" href="./icon-128.png">
-    <link rel="stylesheet" href="./thirdparty/codemirror/codemirror.css">
-    <link rel="stylesheet" href="./thirdparty/codemirror/theme/solarized.css">
-    <link rel="stylesheet" href="./thirdparty/codemirror/addon/dialog/dialog.css">
-    <link rel="stylesheet" href="./thirdparty/pure/pure-min.css">
-    <script src="./thirdparty/es6-shim/es6-shim.min.js"></script>
-    <script src="./thirdparty/zepto/zepto.min.js"></script>
-    <script src="./thirdparty/underscore.js/underscore-min.js"></script>
-    <script src="./thirdparty/vue/vue.min.js"></script>
-    <script src="./thirdparty/jszip/jszip.min.js"></script>
-    <script src="./thirdparty/webmodule/WMAppCacheProxy.min.js"></script>
-    <script src="./thirdparty/webmodule/WMDataURIScheme.min.js"></script>
-    <script src="./thirdparty/webmodule/WMIframeInserter.min.js"></script>
-    <script src="./thirdparty/webmodule/WMURLShortener.min.js"></script>
-    <script src="./thirdparty/webmodule/WMIframeWorker.min.js"></script>
-    <script src="./thirdparty/codemirror/codemirror.min.js"></script>
-    <script src="./thirdparty/codemirror/addon/search/searchcursor.js"></script>
-    <script src="./thirdparty/codemirror/addon/search/search.js"></script>
-    <script src="./thirdparty/codemirror/addon/dialog/dialog.js"></script>
-    <script src="./thirdparty/codemirror/addon/edit/matchbrackets.js"></script>
-    <script src="./thirdparty/codemirror/addon/edit/closebrackets.js"></script>
-    <script src="./thirdparty/codemirror/mode/javascript/javascript.js"></script>
-    <script src="./thirdparty/codemirror/mode/coffeescript/coffeescript.js"></script>
-    <script src="./thirdparty/codemirror/mode/haskell/haskell.js"></script>
-    <script src="./thirdparty/codemirror/mode/xml/xml.js"></script>
-    <script src="./thirdparty/codemirror/mode/jade/jade.js"></script>
-    <script src="./thirdparty/codemirror/mode/css/css.js"></script>
-    <script src="./thirdparty/codemirror/mode/scheme/scheme.js"></script>
-    <script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
-    <script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
-    <script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
-    <script src="https://platform.twitter.com/widgets.js"></script><style>
+
+<style>
 header#menu nav input[type="radio"] {
   display: none;
 }
@@ -132,141 +98,175 @@ code {
 }
 </style>
 
-  </head>
-  <body>
-    <div id="wrapper">
-      <header id="menu" v-on="change: change" class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
-        <nav>
-          <input type="radio" name="tab" id="tab0" value="config" checked>
-          <label for="tab0">Altjsdoit</label>
-          <input type="radio" name="tab" id="tab1" value="altjs">
-          <label for="tab1">{{altjs}}</label>
-          <input type="radio" name="tab" id="tab2" value="althtml">
-          <label for="tab2">{{althtml}}</label>
-          <input type="radio" name="tab" id="tab3" value="altcss">
-          <label for="tab3">{{altcss}}</label>
-          <input type="radio" name="tab" id="tab4" value="compile">
-          <label for="tab4">Compile</label>
-          <input type="radio" name="tab" id="tab5" value="sandbox">
-          <label for="tab5">Run</label>
-        </nav>
-      </header>
-      <section id="main">
-        <section id="box-config" v-on="change: change">
-          <form class="pure-form pure-form-stacked">
-            <fieldset>
-              <legend>Project</legend>
-              <label>Title:
-                <input v-model="title" type="text" value="" placeholder="no title">
-              </label>
-              <label>URL:
-                <input id="config-project-url" v-model="shortenUrl" type="url" value="" placeholder="">
-              </label>
-              <input type="button" value="Save" v-on="click: save" class="pure-button pure-button-primary">&nbsp;<a target="_blank" href="/" class="pure-button">New Project</a>&nbsp;<span id="config-project-twitter"></span>
-            </fieldset>
-            <fieldset>
-              <legend>Compilers</legend>
-              <label>altjs:
-                <select v-model="altjs" data-config="altjs">
-                  <option value="JavaScript" selected>JavaScript</option>
-                  <option value="CoffeeScript">CoffeeScript(1.8.0)</option>
-                  <option value="TypeScript">TypeScript(1.0.0)</option>
-                  <option value="Traceur">Traceur</option>
-                  <option value="LiveScript">LiveScript(1.3.1)</option>
-                  <option value="PureScript">PureScript-in-PureScript</option>
-                  <option value="GorillaScript">GorillaScript</option>
-                  <option value="Roy">Roy(0.2.1)</option>
-                  <option value="BiwaScheme">BiwaScheme(0.6.2)</option>
-                  <option value="Wisp">Wisp(0.10.0)</option>
-                  <option value="LispyScript">LispyScript(0.3.6)</option>
-                  <option value="BlackCoffee">BlackCoffee(1.7.1)</option>
-                </select>
-              </label>
-              <label>althtml:
-                <select v-model="althtml" data-config="althtml">
-                  <option value="HTML" selected>HTML</option>
-                  <option value="Jade">Jade</option>
-                </select>
-              </label>
-              <label>altcss:
-                <select v-model="altcss" data-config="altcss">
-                  <option value="CSS" selected>CSS</option>
-                  <option value="Stylus">Stylus</option>
-                  <option value="LESS">LESS</option>
-                </select>
-              </label>
-            </fieldset>
-            <fieldset>
-              <legend>Libraries</legend>
-              <label>Firebug-Lite(1.4.0):
-                <input v-model="enableFirebugLite" type="checkbox">
-              </label>
-              <label>Zepto(1.1.3):
-                <input v-model="enableZepto" type="checkbox">
-              </label>
-              <label>jQuery(2.1.1):
-                <input v-model="enableJQuery" type="checkbox">
-              </label>
-              <label>Underscore.js(1.6.0):
-                <input v-model="enableUnderscore" type="checkbox">
-              </label>
-              <label>Backbone.js(1.1.2):
-                <input v-model="enableBackbone" type="checkbox">
-              </label>
-              <label>es6-shim(0.11.0):
-                <input v-model="enableES6shim" type="checkbox">
-              </label>
-              <label>Processing.js(1.4.8):
-                <input v-model="enableProcessing" type="checkbox">
-              </label>
-              <label>Chart.js(0.2.0):
-                <input v-model="enableChartjs" type="checkbox">
-              </label>
-              <label>mathjs(0.23.0):
-                <input v-model="enableMathjs" type="checkbox">
-              </label>
-              <label>pure(0.5.0):
-                <input v-model="enablePure" type="checkbox">
-              </label>
-            </fieldset>
-            <fieldset>
-              <legend>Debug</legend>
-              <label>use CodeMirror:
-                <input v-model="enableCodeMirror" type="checkbox" checked="checked">
-              </label>
-              <label>use blobCache:
-                <input v-model="enableBlobCache" type="checkbox">
-              </label>
-              <label>iframe type:
-                <select v-model="iframeType">
-                  <option value="blob" selected>blobURL</option>
-                  <option value="srcdoc">srcdoc</option>
-                  <option value="base64">base64</option>
-                  <option value="message">message</option>
-                  <option value="write">write</option>
-                </select>
-              </label>
-              <label>use buildMode:
-                <input v-model="enableBuildMode" type="checkbox">
-              </label>
-            </fieldset>
-            <fieldset>
-              <legend>About</legend>
-              <p>
-                <script>document.write($("title").html());</script>
-              </p>
-              <p><a target="_blank" href="https://github.com/altjsdoit/" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
-            </fieldset>
-          </form>
-        </section>
-        <section id="box-editor" style="display:none;">
-          <textarea id="box-editor-textarea"></textarea>
-        </section>
-        <section id="box-sandbox" style="display:none;">
-          <iframe id="box-sandbox-iframe"></iframe>
-        </section>
-      </section>
-    </div><script>
+</head>
+<body>
+
+<meta name="Description" content="altjsdoit - A Simple WebApp Editor - "/>
+<meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade"/>
+<meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1"/>
+<base href="https://altjsdoit.github.io/"/>
+<link rel="apple-touch-icon" href="./icon-128.png"/>
+<link rel="stylesheet" href="./thirdparty/codemirror/codemirror.css"/>
+<link rel="stylesheet" href="./thirdparty/codemirror/theme/solarized.css"/>
+<link rel="stylesheet" href="./thirdparty/codemirror/addon/dialog/dialog.css"/>
+<link rel="stylesheet" href="./thirdparty/pure/pure-min.css"/>
+<script src="./thirdparty/es6-shim/es6-shim.min.js"></script>
+<script src="./thirdparty/zepto/zepto.min.js"></script>
+<script src="./thirdparty/vue/vue.min.js"></script>
+<script src="./thirdparty/jszip/jszip.min.js"></script>
+<script src="./thirdparty/webmodule/WMAppCacheProxy.min.js"></script>
+<script src="./thirdparty/webmodule/WMDataURIScheme.min.js"></script>
+<script src="./thirdparty/webmodule/WMIframeInserter.min.js"></script>
+<script src="./thirdparty/webmodule/WMURLShortener.min.js"></script>
+<script src="./thirdparty/webmodule/WMIframeWorker.min.js"></script>
+<script src="./thirdparty/codemirror/codemirror.min.js"></script>
+<script src="./thirdparty/codemirror/addon/search/searchcursor.js"></script>
+<script src="./thirdparty/codemirror/addon/search/search.js"></script>
+<script src="./thirdparty/codemirror/addon/dialog/dialog.js"></script>
+<script src="./thirdparty/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="./thirdparty/codemirror/addon/edit/closebrackets.js"></script>
+<script src="./thirdparty/codemirror/mode/javascript/javascript.js"></script>
+<script src="./thirdparty/codemirror/mode/coffeescript/coffeescript.js"></script>
+<script src="./thirdparty/codemirror/mode/haskell/haskell.js"></script>
+<script src="./thirdparty/codemirror/mode/xml/xml.js"></script>
+<script src="./thirdparty/codemirror/mode/jade/jade.js"></script>
+<script src="./thirdparty/codemirror/mode/css/css.js"></script>
+<script src="./thirdparty/codemirror/mode/scheme/scheme.js"></script>
+<script src="./thirdparty/codemirror/mode/commonlisp/commonlisp.js"></script>
+<script src="./thirdparty/codemirror/mode/clojure/clojure.js"></script>
+<script src="./thirdparty/codemirror/mode/livescript/livescript.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<div id="wrapper">
+  <header id="menu" v-on="change: change" class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
+    <nav>
+      <input type="radio" name="tab" id="tab0" value="config" checked="checked"/>
+      <label for="tab0">Altjsdoit</label>
+      <input type="radio" name="tab" id="tab1" value="altjs"/>
+      <label for="tab1">{{altjs}}</label>
+      <input type="radio" name="tab" id="tab2" value="althtml"/>
+      <label for="tab2">{{althtml}}</label>
+      <input type="radio" name="tab" id="tab3" value="altcss"/>
+      <label for="tab3">{{altcss}}</label>
+      <input type="radio" name="tab" id="tab4" value="compile"/>
+      <label for="tab4">Compile</label>
+      <input type="radio" name="tab" id="tab5" value="sandbox"/>
+      <label for="tab5">Run</label>
+    </nav>
+  </header>
+  <section id="main">
+    <section id="box-config" v-on="change: change">
+      <form class="pure-form pure-form-stacked">
+        <fieldset>
+          <legend>Project</legend>
+          <label>Title:
+            <input v-model="title" type="text" value="" placeholder="no title"/>
+          </label>
+          <label>URL:
+            <input id="config-project-url" type="url" value="" placeholder=""/>
+          </label>
+          <input type="button" value="Save" v-on="click: save" class="pure-button pure-button-primary"/>&nbsp;<a target="_blank" href="/" class="pure-button">New Project</a>&nbsp;<span id="config-project-twitter"></span>
+        </fieldset>
+        <fieldset>
+          <legend>Compilers</legend>
+          <label>altjs:
+            <select v-model="altjs" data-config="altjs">
+              <option value="JavaScript" selected="selected">JavaScript</option>
+              <option value="CoffeeScript">CoffeeScript</option>
+              <option value="TypeScript">TypeScript</option>
+              <option value="Traceur">Traceur</option>
+              <option value="LiveScript">LiveScript</option>
+              <option value="PureScript">PureScript</option>
+              <option value="GorillaScript">GorillaScript</option>
+              <option value="Roy">Roy</option>
+              <option value="BiwaScheme">BiwaScheme</option>
+              <option value="Wisp">Wisp</option>
+              <option value="LispyScript">LispyScript</option>
+              <option value="BlackCoffee">BlackCoffee</option>
+            </select>
+          </label>
+          <label>althtml:
+            <select v-model="althtml" data-config="althtml">
+              <option value="HTML" selected="selected">HTML</option>
+              <option value="Jade">Jade</option>
+            </select>
+          </label>
+          <label>altcss:
+            <select v-model="altcss" data-config="altcss">
+              <option value="CSS" selected="selected">CSS</option>
+              <option value="Stylus">Stylus</option>
+              <option value="LESS">LESS</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Libraries</legend>
+          <label>Firebug-Lite(1.4.0):
+            <input v-model="enableFirebugLite" type="checkbox"/>
+          </label>
+          <label>Zepto(1.1.3):
+            <input v-model="enableZepto" type="checkbox"/>
+          </label>
+          <label>jQuery(2.1.1):
+            <input v-model="enableJQuery" type="checkbox"/>
+          </label>
+          <label>Underscore.js(1.6.0):
+            <input v-model="enableUnderscore" type="checkbox"/>
+          </label>
+          <label>Backbone.js(1.1.2):
+            <input v-model="enableBackbone" type="checkbox"/>
+          </label>
+          <label>es6-shim(0.11.0):
+            <input v-model="enableES6shim" type="checkbox"/>
+          </label>
+          <label>Processing.js(1.4.8):
+            <input v-model="enableProcessing" type="checkbox"/>
+          </label>
+          <label>Chart.js(0.2.0):
+            <input v-model="enableChartjs" type="checkbox"/>
+          </label>
+          <label>mathjs(0.23.0):
+            <input v-model="enableMathjs" type="checkbox"/>
+          </label>
+          <label>pure(0.5.0):
+            <input v-model="enablePure" type="checkbox"/>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Debug</legend>
+          <label>use CodeMirror:
+            <input v-model="enableCodeMirror" type="checkbox" checked="checked"/>
+          </label>
+          <label>use blobCache:
+            <input v-model="enableBlobCache" type="checkbox"/>
+          </label>
+          <label>iframe type:
+            <select v-model="iframeType">
+              <option value="blob" selected="selected">blobURL</option>
+              <option value="srcdoc">srcdoc</option>
+              <option value="base64">base64</option>
+              <option value="message">message</option>
+              <option value="write">write</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>About</legend>
+          <p>
+            <script>document.write($("title").html());</script>
+          </p>
+          <p><a target="_blank" href="https://github.com/altjsdoit/" class="pure-button">Github</a>&nbsp;<a target="_blank" href="https://twitter.com/search?q=%23altjsdoit" class="pure-button">Twitter</a></p>
+        </fieldset>
+      </form>
+    </section>
+    <section id="box-editor" style="display:none;">
+      <textarea id="box-editor-textarea"></textarea>
+    </section>
+    <section id="box-sandbox" style="display:none;">
+      <iframe id="box-sandbox-iframe"></iframe>
+    </section>
+  </section>
+</div>
+<script>
 var ACC, Compiler, Configure, Editor, Sandbox, initTwitter, main, save;
 
 window.URL = window.URL || window.webkitURL || window.mozURL;
@@ -292,7 +292,10 @@ main = function() {
   compile = function(callback) {
     var source;
     source = editor.get();
-    return compiler.compile(source, callback);
+    obj = editor.get();
+    obj.config = config;
+    url = save(obj);
+    return compiler.compile(url, source, callback);
   };
   new Vue({
     el: '#menu',
@@ -444,6 +447,43 @@ save = function(_arg) {
 };
 
 Configure = (function() {
+  var pwd, unzipDataURI, zipDataURI;
+
+  function Configure() {}
+
+  pwd = location.protocol + '//' + location.hostname + location.port + location.pathname;
+
+  zipDataURI = function(dic) {
+    var key, val, zip;
+    zip = new JSZip();
+    for (key in dic) {
+      val = dic[key];
+      zip.file(key, val);
+    }
+    return zip.generate({
+      compression: "DEFLATE"
+    });
+  };
+
+  unzipDataURI = function(base64) {
+    var files, hash, key, val, zip;
+    zip = new JSZip();
+    files = zip.load(base64, {
+      base64: true
+    }).files;
+    hash = {};
+    for (key in files) {
+      val = files[key];
+      hash[key] = zip.file(key).asText();
+    }
+    return hash;
+  };
+
+  return Configure;
+
+})();
+
+Configure = (function() {
   var decodeURIQuery, encodeURIQuery, unzipDataURI, zipDataURI;
 
   function Configure() {}
@@ -525,12 +565,6 @@ Configure = (function() {
     return "#" + encodeURIQuery({
       zip: zipDataURI(dic)
     });
-  };
-
-  Configure.getUrl = function(savedata) {
-    var pwd;
-    pwd = location.protocol + '//' + location.hostname + location.port + location.pathname;
-    return pwd + Configure.encodeHash(savedata);
   };
 
   return Configure;
@@ -772,6 +806,79 @@ Sandbox = (function() {
 })();
 
 Compiler = (function() {
+  var URLToArrayBuffer, URLToText, buildScripts, buildStyles, createProxyURLs, pwd;
+
+  pwd = location.protocol + '//' + location.hostname + location.port;
+
+  createProxyURLs = function(urls, mimetype, callback) {
+    var promises;
+    promises = urls.map(function(url) {
+      return new Promise(function(resolve, reject) {
+        return URLToArrayBuffer(url, function(err, buffer) {
+          if (!!err) {
+            return reject(err);
+          } else {
+            return resolve(URL.createObjectURL(new Blob([buffer], {
+              type: mimetype
+            })));
+          }
+        });
+      });
+    });
+    Promise.all(promises).then(function(urls) {
+      return callback(null, urls);
+    })["catch"](function(err) {
+      return callback(err, []);
+    });
+    return void 0;
+  };
+
+  URLToArrayBuffer = function(url, callback) {
+    var xhr;
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onerror = function(err) {
+      return callback(new Error("network error"), new ArrayBuffer);
+    };
+    xhr.onload = function() {
+      if (this.status === 200 || xhr.status === 0 && xhr.readyState === 4) {
+        return callback(null, xhr.response);
+      }
+    };
+    xhr.send();
+    return void 0;
+  };
+
+  URLToText = function(url, callback) {
+    var xhr;
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'text';
+    xhr.onerror = function(err) {
+      return callback(new Error("network error"), "");
+    };
+    xhr.onload = function() {
+      if (this.status === 200 || xhr.status === 0 && xhr.readyState === 4) {
+        return callback(null, xhr.response);
+      }
+    };
+    xhr.send();
+    return void 0;
+  };
+
+  buildScripts = function(urls) {
+    return urls.map(function(url) {
+      return "<script src='" + url + "'><" + "/" + "script>";
+    }).join("\n");
+  };
+
+  buildStyles = function(urls) {
+    return urls.map(function(url) {
+      return "<link rel='stylesheet' href='" + url + "' />";
+    }).join("\n");
+  };
+
   function Compiler(config) {
     this.config = config;
     this.lang = {
@@ -805,12 +912,91 @@ Compiler = (function() {
     return void 0;
   };
 
-  Compiler.prototype.compile = function(codes, callback) {
+  Compiler.prototype.getIncludeScriptURLs = function(callback) {
+    var urls;
+    urls = [];
+    if (this.config.enableZepto) {
+      urls.push("https://altjsdoit.github.io/thirdparty/zepto/zepto.min.js");
+    }
+    if (this.config.enableJQuery) {
+      urls.push("https://altjsdoit.github.io/thirdparty/jquery/jquery.min.js");
+    }
+    if (this.config.enableUnderscore) {
+      urls.push("https://altjsdoit.github.io/thirdparty/underscore.js/underscore-min.js");
+    }
+    if (this.config.enableBackbone) {
+      urls.push("https://altjsdoit.github.io/thirdparty/backbone.js/backbone-min.js");
+    }
+    if (this.config.enableES6shim) {
+      urls.push("https://altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js");
+    }
+    if (this.config.enableMathjs) {
+      urls.push("https://altjsdoit.github.io/thirdparty/mathjs/math.min.js");
+    }
+    if (this.config.enableProcessing) {
+      urls.push("https://altjsdoit.github.io/thirdparty/processing.js/processing.min.js");
+    }
+    if (this.config.enableChartjs) {
+      urls.push("https://altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js");
+    }
+    if (this.config.enableMathjax) {
+      urls.push("https://altjsdoit.github.io/thirdparty/mathjax/MathJax.js");
+    }
+    if (this.config.enableBlobCache) {
+      createProxyURLs(urls, "text/javascript", function(err, _urls) {
+        return callback(err, buildScripts(_urls));
+      });
+    } else {
+      setTimeout(function() {
+        return callback(null, buildScripts(urls));
+      });
+    }
+    return void 0;
+  };
+
+  Compiler.prototype.getIncludeStyleURLs = function(callback) {
+    var urls;
+    urls = [];
+    if (this.config.enablePure) {
+      urls.push("https://altjsdoit.github.io/thirdparty/pure/pure-min.css");
+    }
+    if (this.config.enableBlobCache) {
+      createProxyURLs(urls, "text/css", function(err, _urls) {
+        return callback(err, buildStyles(_urls));
+      });
+    } else {
+      setTimeout(function() {
+        return callback(null, buildStyles(urls));
+      });
+    }
+    return void 0;
+  };
+
+  Compiler.prototype.getFirebugLiteURL = function(callback) {
+    if (this.config.enableBlobCache) {
+      return URLToText("https://altjsdoit.github.io/thirdparty/firebug/firebug-lite.js", function(err, text) {
+        var _text;
+        if (!!err) {
+          callback(err, "");
+        }
+        _text = text.replace("var m=path&&path.match(/([^\\/]+)\\/$/)||null;", "var m=['build/', 'build']; path='" + (makeDomain(location)) + "/thirdparty/firebug/build/'");
+        return callback(null, URL.createObjectURL(new Blob([_text], {
+          type: "text/javascript"
+        })));
+      });
+    } else {
+      return setTimeout(function() {
+        return callback(null, "https://altjsdoit.github.io/thirdparty/firebug/firebug-lite.js");
+      });
+    }
+  };
+
+  Compiler.prototype.compile = function(savedurl, codeObj, callback) {
     var promises;
     promises = ["altjs", "althtml", "altcss"].map((function(_this) {
       return function(key) {
         return new Promise(function(resolve, reject) {
-          return _this.worker[key].compile(codes[key], function(err, code) {
+          return _this.worker[key].compile(codeObj[key], function(err, code) {
             if (!!err) {
               return resolve([
                 {
@@ -826,147 +1012,49 @@ Compiler = (function() {
     })(this));
     promises.push(new Promise((function(_this) {
       return function(resolve, reject) {
-        var buildScripts, urls, _urls;
-        buildScripts = function(urls) {
-          return urls.map(function(url) {
-            return "<script src='" + url + "'><" + "/" + "script>";
-          }).join("\n");
-        };
-        urls = [];
-        if (_this.config.enableZepto) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/zepto/zepto.min.js");
-        }
-        if (_this.config.enableJQuery) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/jquery/jquery.min.js");
-        }
-        if (_this.config.enableUnderscore) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/underscore.js/underscore-min.js");
-        }
-        if (_this.config.enableBackbone) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/backbone.js/backbone-min.js");
-        }
-        if (_this.config.enableES6shim) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js");
-        }
-        if (_this.config.enableMathjs) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/mathjs/math.min.js");
-        }
-        if (_this.config.enableProcessing) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/processing.js/processing.min.js");
-        }
-        if (_this.config.enableChartjs) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js");
-        }
-        if (_this.config.enableMathjax) {
-          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/mathjax/MathJax.js");
-        }
-        if (!_this.config.enableBlobCache) {
-          return resolve(buildScripts(urls));
-        }
-        _urls = urls.map(function(url) {
-          return {
-            url: url,
-            mimeType: "text/javascript"
-          };
-        });
-        return WMAppCacheProxy.createProxyURLs(_urls, function(err, blobedUrls) {
+        return _this.getIncludeScriptURLs(function(err, scripts) {
           if (!!err) {
             return reject(err);
           }
-          return resolve(buildScripts(blobedUrls));
-        });
-      };
-    })(this)));
-    promises.push(new Promise((function(_this) {
-      return function(resolve, reject) {
-        var buildStyles, urls, _urls;
-        buildStyles = function(urls) {
-          return urls.map(function(url) {
-            return "<link rel='stylesheet' href='" + url + "' />";
-          }).join("\n");
-        };
-        urls = [];
-        if (_this.config.enablePure) {
-          urls.push("https://altjsdoit.github.io/thirdparty/pure/pure-min.css");
-        }
-        if (!_this.config.enableBlobCache) {
-          return resolve(buildStyles(urls));
-        }
-        _urls = urls.map(function(url) {
-          return {
-            url: url,
-            mimeType: "text/css"
-          };
-        });
-        return WMAppCacheProxy.createProxyURLs(_urls, function(err, blobedUrls) {
-          if (!!err) {
-            return reject(err);
-          }
-          return resolve(buildStyles(blobedUrls));
-        });
-      };
-    })(this)));
-    promises.push(new Promise((function(_this) {
-      return function(resolve, reject) {
-        var getFirebugHtml;
-        if (!_this.config.enableFirebugLite) {
-          return resolve("");
-        }
-        getFirebugHtml = function(firebugURL) {
-          return "<script id='FirebugLite' FirebugLite='4' src='" + firebugURL + "'>\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n<" + "/" + "script>\n<script>\nwindow.addEventListener(\"error\", function(ev){\n  console.error(ev.message + \"\\n  at \" + ev.filename + \":\" + ev.lineno + \":\" + ev.colno);\n  console.error(ev.error.stack);\n  console.error(ev.error);\n});\n<" + "/" + "script>";
-        };
-        if (!_this.config.enableBlobCache) {
-          return resolve(getFirebugHtml("https://altjsdoit.github.io/thirdparty/firebug/firebug-lite.js"));
-        }
-        return WMAppCacheProxy.createProxyURL("https://altjsdoit.github.io/thirdparty/firebug/firebug-lite-patched.js", "text/javascript", function(err, blobedUrl) {
-          if (!!err) {
-            return reject(err);
-          }
-          return resolve(getFirebugHtml(blobedUrl));
-        });
-      };
-    })(this)));
-    promises.push(new Promise((function(_this) {
-      return function(resolve, reject) {
-        var altcss, althtml, altjs, config, generator, longUrl;
-        altjs = codes.altjs, althtml = codes.althtml, altcss = codes.altcss;
-        config = JSON.stringify(_this.config);
-        longUrl = Configure.getUrl({
-          altjs: altjs,
-          althtml: althtml,
-          altcss: altcss,
-          config: config
-        });
-        generator = $("meta[name='generator'][content='AltJSDoIt']").attr("url");
-        return new WMURLShortener().shorten(longUrl, function(err, shortUrl) {
-          if (!!err) {
-            return resolve("<meta name='generator' content='AltJSDoIt' generator='" + generator + "' url='" + longUrl + "' />\n");
-          } else {
-            return resolve("<meta name='generator' content='AltJSDoIt' generator='" + generator + "' url='" + shortUrl + "' />\n");
-          }
+          return _this.getIncludeStyleURLs(function(err, styles) {
+            if (!!err) {
+              return reject(err);
+            } else {
+              return new WMURLShortener().shorten(savedurl, function(err, shortUrl) {
+                if (!!err) {
+                  return resolve(("<meta name='generator' content='AltJSDoIt' url='" + savedurl + "' />\n") + scripts + "\n" + styles);
+                } else {
+                  return resolve(("<meta name='generator' content='AltJSDoIt' url='" + shortUrl + "' />\n") + scripts + "\n" + styles);
+                }
+              });
+            }
+          });
         });
       };
     })(this)));
     Promise.all(promises).then((function(_this) {
       return function(_arg) {
-        var css, cssErr, firebug, generator, html, htmlErr, js, jsErr, scripts, styles, _ref, _ref1, _ref2;
-        (_ref = _arg[0], jsErr = _ref[0], js = _ref[1]), (_ref1 = _arg[1], htmlErr = _ref1[0], html = _ref1[1]), (_ref2 = _arg[2], cssErr = _ref2[0], css = _ref2[1]), scripts = _arg[3], styles = _arg[4], firebug = _arg[5], generator = _arg[6];
+        var css, cssErr, html, htmlErr, js, jsErr, link, _ref, _ref1, _ref2;
+        (_ref = _arg[0], jsErr = _ref[0], js = _ref[1]), (_ref1 = _arg[1], htmlErr = _ref1[0], html = _ref1[1]), (_ref2 = _arg[2], cssErr = _ref2[0], css = _ref2[1]), link = _arg[3];
         if (!!jsErr || !!htmlErr || !!cssErr) {
           return callback(new Error("compile error"), _this.createError(jsErr, htmlErr, cssErr, null));
+        } else {
+          if (_this.config.enableFirebugLite) {
+            return _this.getFirebugLiteURL(function(err, firebugURL) {
+              if (!!err) {
+                throw new Error(err);
+              }
+              link = "<script id='FirebugLite' FirebugLite='4' src='" + firebugURL + "'>\n{\n  overrideConsole:true,\n  showIconWhenHidden:true,\n  startOpened:true,\n  enableTrace:true\n}\n<" + "/" + "script>\n<script>\nwindow.addEventListener(\"error\", function(ev){\n  console.error(ev.message + \"\\n  at \" + ev.filename + \":\" + ev.lineno + \":\" + ev.colno);\n  console.error(ev.error.stack);\n  console.error(ev.error);\n});\n<" + "/" + "script>\n" + link;
+              return callback(null, _this.createHTML(js, html, css, link));
+            });
+          } else {
+            return callback(null, _this.createHTML(js, html, css, link));
+          }
         }
-        if (!_this.config.enableBuildMode) {
-          return callback(null, _this.createHTML(js, html, css, generator + styles + firebug + scripts));
-        }
-        return callback(null, _.template(html)({
-          title: "\n<title>" + _this.config.title + "</title>",
-          imports: "\n" + generator + styles + firebug + scripts,
-          style: css,
-          script: js
-        }));
       };
     })(this))["catch"]((function(_this) {
       return function(bugErr) {
-        return callback(new Error("internal error"), _this.createError(null, null, null, bugErr));
+        return callback(new Error("internal error"), _this.createError("", "", "", bugErr));
       };
     })(this))["catch"](function(err) {
       return console.error(err);
@@ -974,27 +1062,27 @@ Compiler = (function() {
     return void 0;
   };
 
-  Compiler.prototype.createHTML = function(js, html, css, link) {
-    return "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\" />\n<title>" + this.config.title + "</title>\n" + link + "\n" + css + "\n</head>\n<body>\n" + html + "\n" + js + "\n</body>\n</html>";
-  };
-
   Compiler.prototype.createError = function(jsErr, htmlErr, cssErr, bugErr) {
     var report;
     report = "";
     if (!!jsErr) {
-      report += this.lang.altjs + ":\n" + (jsErr.stack || jsErr.message || "compile error\n");
+      report += this.lang.altjs + ":\n" + (jsErr.stack || jsErr.message || "compile error");
     }
     if (!!htmlErr) {
-      report += this.lang.althtml + ":\n" + (htmlErr.stack || htmlErr.message || "compile error\n");
+      report += this.lang.althtml + ":\n" + (htmlErr.stack || htmlErr.message || "compile error");
     }
     if (!!cssErr) {
-      report += this.lang.altcss + ":\n" + (cssErr.stack || cssErr.message || "compile error\n");
+      report += this.lang.altcss + ":\n" + (cssErr.stack || cssErr.message || "compile error");
     }
     if (!!bugErr) {
-      report += "internal error" + ":\n" + (bugErr.stack || bugErr.message || "internal error\n");
+      report += "internal error" + ":\n" + (bugErr.stack || bugErr.message || "internal error");
     }
     console.error(report);
     return "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\" />\n<style>\npre{font-family: 'Source Code Pro','Menlo','Monaco','Andale Mono','lucida console','Courier New','monospace';}\n</style>\n</head>\n<body>\n<pre>\n" + report + "</pre>\n</body>\n</html>";
+  };
+
+  Compiler.prototype.createHTML = function(js, html, css, link) {
+    return "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\" />\n<title>" + this.config.title + "</title>\n" + link + "\n" + css + "\n</head>\n<body>\n" + html + "\n" + js + "\n</body>\n</html>";
   };
 
   return Compiler;
@@ -1226,7 +1314,7 @@ ACC = (function() {
     },
     "CoffeeScript": {
       "compiler": function() {
-        self.importScripts("https://altjsdoit.github.io/thirdparty/coffee-script/coffee-script.js");
+        self.importScripts("https://altjsdoit.github.io/thirdparty/coffee-script/coffee-script.min.js");
         return self.addEventListener("message", function(_arg) {
           var code, err, error, html, js, session, _ref;
           _ref = _arg.data, session = _ref.session, code = _ref.data;
@@ -1587,5 +1675,5 @@ ACC = (function() {
 main();
 </script>
 
-  </body>
+</body>
 </html>
