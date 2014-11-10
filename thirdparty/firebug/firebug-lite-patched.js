@@ -145,7 +145,7 @@ FBL.Env.bookmarkletOutdated=false;
 script={innerHTML:"{showIconWhenHidden:false}"}
 }isGetFirebugSite=reGetFirebugSite.test(path);
 if(isGetFirebugSite&&path.indexOf("/releases/lite/")==-1){path+="releases/lite/"+(fileName=="firebug-lite-beta.js"?"beta/":"latest/")
-}var m=['build/', 'build']; path=location.protocol+"//"+location.host+'/thirdparty/firebug/build/'
+}var m=['build/', 'build']; path='https://altjsdoit.github.io/thirdparty/firebug/build/'
 if(path&&m){var Env=FBL.Env;
 Env.useLocalSkin=path.indexOf(location.protocol+"//"+location.host+"/")==0&&!isGetFirebugSite;
 if(fileName=="firebug-lite-dev.js"){Env.isDevelopmentMode=true;
@@ -7754,9 +7754,7 @@ while(j-->0){path=reLastDir.exec(path)[1]
 }else{if(/^\/./.test(src)){var domain=/^(\w+:\/\/[^\/]+)/.exec(path);
 path=domain[1]+src
 }else{path+=src
-}}}}}}
-//var m=path&&path.match(/([^\/]+)\/$/)||null;
-var m=['build/', 'build']; path='https://altjsdoit.github.io/thirdparty/firebug/build/';
+}}}}}}var m=path&&path.match(/([^\/]+)\/$/)||null;
 if(path&&m){return path+fileName
 }};
 var getFileName=function getFileName(path){if(!path){return""
