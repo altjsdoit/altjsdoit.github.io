@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="UTF-8">
-<title>AltJSDoIt 0.11.09 zeta</title>
+<title>AltJSDoIt 0.11.10 zeta</title>
     <meta name="Description" content="altjsdoit - A Simple WebApp Editor - ">
     <meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade">
     <meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1">
-<meta name='generator' content='AltJSDoIt' generator='http://goo.gl/BwuMvd' url='http://goo.gl/x6Fgsh' />
+<meta name='generator' content='AltJSDoIt' generator='http://goo.gl/BwuMvd' url='http://goo.gl/E4XFPg' />
 
     <base href="https://altjsdoit.github.io/">
     <link rel="apple-touch-icon" href="./icon-128.png">
@@ -918,7 +918,7 @@ Compiler = (function() {
         if (!_this.config.enableBlobCache) {
           return resolve(getFirebugHtml("https://altjsdoit.github.io/thirdparty/firebug/firebug-lite.js"));
         }
-        return WMAppCacheProxy.createProxyURL("https://altjsdoit.github.io/thirdparty/firebug/firebug-lite.js", "text/javascript", function(err, blobedUrl) {
+        return WMAppCacheProxy.createProxyURL("https://altjsdoit.github.io/thirdparty/firebug/firebug-lite-patched.js", "text/javascript", function(err, blobedUrl) {
           if (!!err) {
             return reject(err);
           }
