@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# AltJSDoIt 0.10.38 epsilon
+# AltJSDoIt 0.11.11 eta
 
 
 CACHE:
@@ -48,11 +48,12 @@ thirdparty/codemirror/mode/scheme/scheme.js
 thirdparty/codemirror/mode/xml/xml.js
 thirdparty/codemirror/theme/solarized.css
 thirdparty/coffee-script/black-coffee-script.js
-thirdparty/coffee-script/coffee-script.min.js
+thirdparty/coffee-script/coffee-script.js
 thirdparty/es6-shim/es6-shim.min.js
 thirdparty/escodegen/escodegen.browser.js
 thirdparty/escodegen/esprima.js
 thirdparty/firebug/firebug-lite.js
+thirdparty/firebug/firebug-lite-patched.js
 thirdparty/gorillascript/gorillascript.min.js
 thirdparty/jade/jade.min.js
 thirdparty/jquery/jquery.min.js
@@ -81,6 +82,11 @@ thirdparty/twitter/widgets.js
 thirdparty/typescript/typescript.min.js
 thirdparty/underscore.js/underscore-min.js
 thirdparty/vue/vue.min.js
+thirdparty/webmodule/iframe.html
+thirdparty/webmodule/WMAppCacheProxy.min.js
+thirdparty/webmodule/WMDataURIScheme.min.js
+thirdparty/webmodule/WMIframeInserter.min.js
+thirdparty/webmodule/WMIframeWorker.min.js
 thirdparty/webmodule/WMURLShortener.min.js
 thirdparty/wisp/wisp.js
 # thirdparty/zepto/touch.js
