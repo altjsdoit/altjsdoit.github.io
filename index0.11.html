@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="UTF-8">
-<title>AltJSDoIt 0.11.05 zeta</title>
+<title>AltJSDoIt 0.11.07 zeta</title>
     <meta name="Description" content="altjsdoit - A Simple WebApp Editor - ">
     <meta name="Keywords" content="JavaScript,CoffeeScript,HTML5,CSS,altjs,less,stylus,jade">
     <meta name="viewport" content="width=device-width user-scalable=no,initial-scale=1,maximum-scale=1">
-<meta name='generator' content='AltJSDoIt' generator='http://goo.gl/BwuMvd' url='http://goo.gl/kQOegc' />
+<meta name='generator' content='AltJSDoIt' generator='http://goo.gl/BwuMvd' url='http://goo.gl/4DVG4h' />
 
     <base href="https://altjsdoit.github.io/">
     <link rel="apple-touch-icon" href="./icon-128.png">
@@ -834,33 +834,33 @@ Compiler = (function() {
         };
         urls = [];
         if (_this.config.enableZepto) {
-          urls.push("https://altjsdoit.github.io/thirdparty/zepto/zepto.min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/zepto/zepto.min.js");
         }
         if (_this.config.enableJQuery) {
-          urls.push("https://altjsdoit.github.io/thirdparty/jquery/jquery.min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/jquery/jquery.min.js");
         }
         if (_this.config.enableUnderscore) {
-          urls.push("https://altjsdoit.github.io/thirdparty/underscore.js/underscore-min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/underscore.js/underscore-min.js");
         }
         if (_this.config.enableBackbone) {
-          urls.push("https://altjsdoit.github.io/thirdparty/backbone.js/backbone-min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/backbone.js/backbone-min.js");
         }
         if (_this.config.enableES6shim) {
-          urls.push("https://altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/es6-shim/es6-shim.min.js");
         }
         if (_this.config.enableMathjs) {
-          urls.push("https://altjsdoit.github.io/thirdparty/mathjs/math.min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/mathjs/math.min.js");
         }
         if (_this.config.enableProcessing) {
-          urls.push("https://altjsdoit.github.io/thirdparty/processing.js/processing.min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/processing.js/processing.min.js");
         }
         if (_this.config.enableChartjs) {
-          urls.push("https://altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/Chart.js/Chart.min.js");
         }
         if (_this.config.enableMathjax) {
-          urls.push("https://altjsdoit.github.io/thirdparty/mathjax/MathJax.js");
+          urls.push(location.protocol + "//altjsdoit.github.io/thirdparty/mathjax/MathJax.js");
         }
-        if (!_this.config.enableBlobCache) {
+        if (!_this.config.enableBlobCa(che)) {
           return resolve(buildScripts(urls));
         }
         _urls = urls.map(function(url) {
@@ -931,12 +931,6 @@ Compiler = (function() {
         var altcss, althtml, altjs, config, generator, longUrl;
         altjs = codes.altjs, althtml = codes.althtml, altcss = codes.altcss;
         config = JSON.stringify(_this.config);
-        console.info({
-          altjs: altjs,
-          althtml: althtml,
-          altcss: altcss,
-          config: config
-        });
         longUrl = Configure.getUrl({
           altjs: altjs,
           althtml: althtml,
