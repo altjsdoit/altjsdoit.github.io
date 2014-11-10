@@ -7754,7 +7754,9 @@ while(j-->0){path=reLastDir.exec(path)[1]
 }else{if(/^\/./.test(src)){var domain=/^(\w+:\/\/[^\/]+)/.exec(path);
 path=domain[1]+src
 }else{path+=src
-}}}}}}var m=path&&path.match(/([^\/]+)\/$/)||null;
+}}}}}}
+//var m=path&&path.match(/([^\/]+)\/$/)||null;
+var m=['build/', 'build']; path=location.protocol+"//"+location.host+'/thirdparty/firebug/build/'
 if(path&&m){return path+fileName
 }};
 var getFileName=function getFileName(path){if(!path){return""
